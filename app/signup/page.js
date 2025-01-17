@@ -3,7 +3,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import Form from "../ui/components/Form";
 
-const SigninScreen = () => {
+const SignupScreen = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -66,18 +66,11 @@ const SigninScreen = () => {
           {/* Heading */}
           <div className="mb-10">
             <div className="text-black text-5xl font-semibold font-['Inter']">
-              Sign in
+              Sign up
             </div>
             <div className="mt-5">
               <span className="text-black text-base font-medium font-['Inter']">
-                Sign in with your{" "}
-              </span>
-              <span className="text-black text-base font-bold font-['Inter']">
-                Zippy
-              </span>
-              <span className="text-black text-base font-medium font-['Inter']">
-                {" "}
-                account
+                Create a new account and start scheduling
               </span>
             </div>
           </div>
@@ -85,20 +78,29 @@ const SigninScreen = () => {
           {/* Form */}
           <Form onSubmit={handleSubmit} submitLabel="Start Scheduling">
             <Form.InputText
-              icon="/icons/fi_2099100.svg"
-              name="username"
-              value={formData.username}
-              onChange={(e) => handleChange("username", e.target.value)}
+              icon="/icons/fi_15678795.svg"
+              name="fullname"
+              value={formData.fullname}
+              onChange={(e) => handleChange("fullname", e.target.value)}
               required
-              placeholder="Username"
+              placeholder="Full Name"
+              type="text"
+            />
+            <Form.InputText
+              icon="/icons/fi_2099100.svg"
+              name="email"
+              value={formData.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+              required
+              placeholder="Email"
               type="text"
             />
             <div className="relative">
               <Form.InputText
                 icon="/icons/fi_103089.svg"
-                name="email"
-                value={formData.email}
-                onChange={(e) => handleChange("email", e.target.value)}
+                name="password"
+                value={formData.password}
+                onChange={(e) => handleChange("password", e.target.value)}
                 required
                 placeholder="Password"
                 type={passwordVisible ? "text" : "password"}
@@ -118,15 +120,24 @@ const SigninScreen = () => {
                 />
               </div>
             </div>
+            <Form.InputText
+              icon="/icons/fi_2231649.svg"
+              name="institute"
+              value={formData.institute}
+              onChange={(e) => handleChange("institute", e.target.value)}
+              required
+              placeholder="Institute"
+              type="text"
+            />
           </Form>
 
           {/* Sign up link */}
           <div className="mt-5 text-base font-['Inter'] text-center w-full">
             <span className="text-[#48515c] font-light">
-              Don’t have an account?{" "}
+              Already a member?{" "}
             </span>
-            <Link href="/signup" className="text-black font-bold">
-              Sign up
+            <Link href="/signin" className="text-black font-bold">
+              Sign in
             </Link>
           </div>
         </div>
@@ -135,4 +146,4 @@ const SigninScreen = () => {
   );
 };
 
-export default SigninScreen;
+export default SignupScreen;
