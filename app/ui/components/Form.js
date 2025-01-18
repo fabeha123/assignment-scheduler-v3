@@ -1,4 +1,4 @@
-"use client"; // Add this line at the very top of the file
+"use client";
 import React, { useState } from "react";
 import Button from "./Button";
 
@@ -13,6 +13,7 @@ const Form = ({ children, onSubmit, submitLabel = "Submit" }) => {
   );
 };
 
+// Text Input Component
 const InputText = ({
   icon,
   value,
@@ -37,7 +38,39 @@ const InputText = ({
   );
 };
 
+// Dropdown/Select Input Component
+const InputSelect = ({
+  icon,
+  value,
+  onChange,
+  options = [],
+  required = false,
+}) => {
+  return (
+    <div className="relative w-[440px] h-[55px] bg-[#f4f4f4] rounded-[13px] flex items-center px-4 mb-[25px]">
+      {icon && <img src={icon} alt="icon" />}
+
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
+        className="bg-transparent outline-none text-black text-base font-normal font-['Inter'] flex-1 ml-3"
+      >
+        <option value="" disabled>
+          Select an option
+        </option>
+        {options.map((option, index) => (
+          <option key={index} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
+
 // Attach input components to Form
 Form.InputText = InputText;
+Form.InputSelect = InputSelect;
 
 export default Form;
