@@ -1,6 +1,6 @@
 import React, { Children } from "react";
 
-const Button = ({ variant = "primary", size = "medium", children, onClick }) => {
+const Button = ({ variant = "primary", children, onClick }) => {
     const baseStyle = "rounded-full font-medium focus:outline-none";
     const variantStyles = {
       primary: "w-[440px] h-[55px] bg-[#6ec5ff] rounded-[100px] text-white text-base font-bold font-['Inter']",
@@ -8,13 +8,6 @@ const Button = ({ variant = "primary", size = "medium", children, onClick }) => 
       // outlined: "border border-blue-500 text-blue-500 hover:bg-blue-50",
     };
     
-    // const sizeStyles = {
-    //     small: "px-4 py-2 text-sm",
-    //     medium: "px-6 py-3 text-base",
-    //     large: "px-8 py-4 text-lg",
-    //   };
-    
-      // Combine the styles
       const styles = `${baseStyle} ${variantStyles[variant]}`;
     
       return (
