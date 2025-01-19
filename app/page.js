@@ -1,5 +1,4 @@
 import Image from "next/image";
-import "@fontsource/inter/variable.css";
 
 export default function Home() {
   return (
