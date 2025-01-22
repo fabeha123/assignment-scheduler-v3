@@ -8,11 +8,15 @@ const SignupForm = ({ onSuccess }) => {
     fullname: "",
     email: "",
     password: "",
-    institute: "",
   });
 
+  // Show success/error feedback to the user
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [passwordVisible, setPasswordVisible] = useState(false);
-  //adding random functions for now
+
+  // Update field state
   const handleChange = (name, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -20,18 +24,55 @@ const SignupForm = ({ onSuccess }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  // Toggle password visibility
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
+  // Form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
 
-    // Call the parent handler
-    if (onSuccess) {
-      onSuccess(formData);
-    }
-  };
+    // Clear any previous messages on new attempt
+    setSuccessMessage("");
+    setErrorMessage("");
 
-  const togglePasswordVisibility = () => {
-    setPasswordVisible(!passwordVisible);
+    try {
+      //POST the form data to signup api
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      console.log("Response from server:", data);
+
+      if (!res.ok) {
+        // res.ok == false => status >= 400
+        setErrorMessage(data.message || "Failed to submit form");
+        return;
+      }
+
+      // If res.ok is true => status 200 => user created
+      setSuccessMessage("Sign-up successful! You can now log in.");
+
+      // 2) Trigger any parent callback if needed
+      if (onSuccess) {
+        onSuccess(formData);
+      }
+
+      // reset the form fields
+      setFormData({
+        fullname: "",
+        email: "",
+        password: "",
+      });
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("An error occurred. Please try again later.");
+    }
   };
 
   return (
@@ -45,6 +86,7 @@ const SignupForm = ({ onSuccess }) => {
         placeholder="Full Name"
         type="text"
       />
+
       <Form.InputText
         icon="/icons/fi_2099100.svg"
         name="email"
@@ -52,8 +94,9 @@ const SignupForm = ({ onSuccess }) => {
         onChange={(e) => handleChange("email", e.target.value)}
         required
         placeholder="Email"
-        type="text"
+        type="email"
       />
+
       <div className="relative">
         <Form.InputText
           icon="/icons/fi_103089.svg"
@@ -79,15 +122,12 @@ const SignupForm = ({ onSuccess }) => {
           />
         </div>
       </div>
-      <Form.InputSelect
-        icon="/icons/fi_2231649.svg"
-        name="institute"
-        value={formData.institute}
-        onChange={(e) => handleChange("institute", e.target.value)}
-        required
-        placeholder="Institute"
-        type="text"
-      />
+
+      {/* Success and error messages */}
+      {successMessage && (
+        <p className="text-green-600 mt-2">{successMessage}</p>
+      )}
+      {errorMessage && <p className="text-red-600 mt-2">{errorMessage}</p>}
     </Form>
   );
 };

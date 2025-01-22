@@ -7,7 +7,6 @@ import Link from "next/link";
 const SignupScreen = () => {
   const handleFormSuccess = (formData) => {
     console.log("Form data received in parent:", formData);
-    // API or Database stuff
   };
 
   return (
