@@ -1,6 +1,7 @@
 "use client";
 
 import Subheader from "../../ui/components/Subheader";
+import StudentsTable from "../../ui/tables/StudentsTable";
 
 const StudentsScreen = () => {
   return (
@@ -23,6 +24,8 @@ const StudentsScreen = () => {
           ]}
         />
       </div>
+      {/* add filter and sort functions */}
+      <StudentsTable />
     </div>
   );
 };
