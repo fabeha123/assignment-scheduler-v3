@@ -26,7 +26,7 @@ const SignupScreen = () => {
 
       <div className="mt-5 text-base font-['Inter'] text-center w-full">
         <span className="text-[#48515c] font-light">Already a member? </span>
-        <Link href="/auth/signin" className="text-black font-bold">
+        <Link href="/signin" className="text-black font-bold">
           Sign in
         </Link>
       </div>

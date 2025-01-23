@@ -36,7 +36,7 @@ const SigninScreen = () => {
         <span className="text-[#48515c] font-light">
           Don’t have an account?{" "}
         </span>
-        <Link href="/auth/signup" className="text-black font-bold">
+        <Link href="/signup" className="text-black font-bold">
           Sign up
         </Link>
       </div>
