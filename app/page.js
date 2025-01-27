@@ -2,100 +2,287 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="w-[1440px] h-[1024px] relative bg-white rounded-[50px]  overflow-hidden">
+      <div className="w-[1122px] h-[70px] left-[318px] top-[75px] absolute">
+        <div className="w-[1122px] h-[70px] left-0 top-0 absolute bg-white border-b border-[#e8ebf0]" />
+        <div className="w-64 h-9 left-[846px] top-[20px] absolute">
+          <div className="w-[152px] h-9 left-0 top-0 absolute">
+            <div className="w-[152px] h-9 left-0 top-0 absolute bg-white rounded-[7px] border border-[#e8ebf0]" />
+            <div className="left-[14px] top-[9px] absolute text-[#48515c] text-[15px] font-light font-['Inter']">
+              Add New Student
+            </div>
+          </div>
+          <div className="w-[84px] h-9 left-[172px] top-0 absolute">
+            <div className="w-[84px] h-9 left-0 top-0 absolute bg-[#54b5f6] rounded-[7px] border" />
+            <div className="left-[19px] top-[9px] absolute text-white text-[15px] font-normal font-['Inter']">
+              Import
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div className="left-[35px] top-[26px] absolute text-black text-base font-semibold font-['Inter']">
+          Students
+        </div>
+      </div>
+      <div className="w-[1440px] h-[75px] left-0 top-0 absolute">
+        <div className="w-[1440px] h-[75px] left-0 top-0 absolute bg-[#6ec5ff]" />
+        <div className="w-[637px] h-[55px] left-[402px] top-[10px] absolute">
+          <div className="w-[637px] h-[55px] left-0 top-0 absolute bg-[#53b5f6] rounded-[13px]" />
+          <div className="w-[90px] h-[25px] left-[15px] top-[15px] absolute">
+            <div className="w-[25px] h-[25px] left-0 top-0 absolute flex-col justify-start items-start inline-flex" />
+            <div className="left-[35px] top-[3px] absolute text-white text-base font-bold font-['Inter']">
+              Search
+            </div>
+          </div>
+        </div>
+        <div className="w-[91px] h-7 left-[35px] top-[24px] absolute">
+          <div className="w-6 h-6 left-0 top-[2px] absolute flex-col justify-start items-start inline-flex overflow-hidden" />
+          <div className="left-[34px] top-0 absolute text-white text-2xl font-normal font-['Gochi Hand']">
+            Zippy
+          </div>
+        </div>
+      </div>
+      <div className="w-[333px] h-[949px] left-0 top-[75px] absolute">
+        <div className="w-[318px] h-[949px] left-0 top-0 absolute bg-[#fbfbfb] border-r border-[#e8ebf0]" />
+        <div className="w-[318px] h-[309px] left-0 top-[70px] absolute">
+          <div className="w-[318px] h-[309px] left-0 top-0 absolute border-b border-[#e8ebf0]" />
+          <div className="w-[76px] h-[19px] left-[31px] top-[20px] absolute">
+            <div className="w-[18px] h-[18px] left-0 top-[1px] absolute flex-col justify-start items-start inline-flex overflow-hidden" />
+            <div className="left-[34px] top-0 absolute text-black text-[15px] font-normal font-['Inter']">
+              Home
+            </div>
+          </div>
+          <div className="w-[101px] h-6 left-[31px] top-[64px] absolute">
+            <div className="w-6 h-6 left-0 top-0 absolute flex-col justify-start items-start inline-flex overflow-hidden" />
+            <div className="left-[37px] top-[3px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Students
+            </div>
+          </div>
+          <div className="w-[72px] h-6 left-[28px] top-[113px] absolute">
+            <div className="w-6 h-6 left-0 top-0 absolute flex-col justify-start items-start inline-flex overflow-hidden" />
+            <div className="left-[37px] top-[5px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Staff
+            </div>
+          </div>
+          <div className="w-[98px] h-6 left-[28px] top-[211px] absolute">
+            <div className="w-6 h-6 left-0 top-0 absolute flex-col justify-start items-start inline-flex overflow-hidden">
+              <div className="w-4 h-2.5 relative"></div>
+            </div>
+            <div className="left-[37px] top-[5px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Modules
+            </div>
+          </div>
+          <div className="w-[278px] h-11 left-[20px] top-[152px] absolute">
+            <div className="w-[278px] h-11 left-0 top-0 absolute bg-[#d2edff] rounded-[10px]" />
+            <div className="w-[97px] h-6 left-[8px] top-[10px] absolute">
+              <div className="w-6 h-6 left-0 top-0 absolute flex-col justify-start items-start inline-flex overflow-hidden">
+                <div className="w-4 h-2.5 relative"></div>
+              </div>
+              <div className="left-[37px] top-[5px] absolute text-[#408fc3] text-[15px] font-medium font-['Inter']">
+                Courses
+              </div>
+            </div>
+          </div>
+          <div className="w-32 h-6 left-[28px] top-[260px] absolute">
+            <div className="w-6 h-6 left-0 top-0 absolute flex-col justify-start items-start inline-flex overflow-hidden">
+              <div className="w-4 h-2.5 relative"></div>
+            </div>
+            <div className="left-[37px] top-[5px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Assignments
+            </div>
+          </div>
+        </div>
+        <div className="w-[318px] h-[70px] left-0 top-0 absolute">
+          <div className="w-[318px] h-[70px] left-0 top-0 absolute border-b border-[#e8ebf0]" />
+          <div className="w-[214px] h-[30px] left-[20px] top-[20px] absolute">
+            <div className="w-[25px] h-[25px] left-[189px] top-[3px] absolute" />
+            <div className="left-[45px] top-[6px] absolute text-black text-base font-semibold font-['Inter']">
+              Fabeha Saleem
+            </div>
+            <div className="w-[30px] h-[30px] left-0 top-0 absolute">
+              <div className="w-[30px] h-[30px] left-0 top-0 absolute bg-[#ff6f61] rounded-lg" />
+              <div className="left-[5px] top-[6px] absolute text-white text-base font-bold font-['Inter']">
+                FS
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="w-[30px] h-[30px] left-[303px] top-[20px] absolute">
+          <div className="w-[30px] h-[30px] left-0 top-0 absolute bg-white rounded-full shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)] border" />
+          <div className="w-[25px] h-[25px] left-[3px] top-[3px] absolute" />
+        </div>
+      </div>
+      <div className="w-[131px] h-[30px] left-[353px] top-[160px] absolute">
+        <div className="w-[131px] h-[30px] left-0 top-0 absolute bg-[#d2edff] rounded-[100px] border border-[#0075c4]" />
+        <div className="left-[27px] top-[7px] absolute text-[#0075c4] text-[13px] font-normal font-['Inter']">
+          Group: None
+        </div>
+      </div>
+      <div className="w-[81px] h-[30px] left-[494px] top-[160px] absolute">
+        <div className="w-[81px] h-[30px] left-0 top-0 absolute bg-white rounded-[100px] border border-[#e8ebf0]" />
+        <div className="left-[25px] top-[7px] absolute text-black text-[13px] font-normal font-['Inter']">
+          Filter
+        </div>
+      </div>
+      <div className="w-[1067px] h-[487px] left-[353px] top-[205px] absolute">
+        <div className="w-[1067px] h-7 left-0 top-0 absolute">
+          <div className="w-[1067px] h-7 left-0 top-0 absolute bg-white border-b border-[#e8ebf0]" />
+          <div className="w-[756px] h-4 left-0 top-[6px] absolute">
+            <div className="left-0 top-0 absolute text-black text-[13px] font-light font-['Inter']">
+              Name
+            </div>
+            <div className="left-[312px] top-0 absolute text-black text-[13px] font-light font-['Inter']">
+              Course
+            </div>
+            <div className="left-[563px] top-0 absolute text-black text-[13px] font-light font-['Inter']">
+              Year
+            </div>
+            <div className="left-[704px] top-0 absolute text-black text-[13px] font-light font-['Inter']">
+              Modules
+            </div>
+          </div>
+        </div>
+        <div className="w-[1067px] h-[60px] left-0 top-[28px] absolute">
+          <div className="w-[1067px] h-[60px] left-0 top-0 absolute bg-white border-b border-[#e8ebf0]" />
+          <div className="w-3.5 h-3.5 left-0 top-[22px] absolute bg-white rounded-[3px] border border-[#e8ebf0]" />
+          <div className="w-[1031px] h-9 left-[36px] top-[12px] absolute">
+            <div className="left-0 top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Fabeha Saleem
+            </div>
+            <div className="left-[276px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              BSc Computer Science
+            </div>
+            <div className="left-[527px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Final Year
+            </div>
+            <div className="w-[363px] left-[668px] top-0 absolute text-black text-[15px] font-normal font-['Inter']">
+              Advance Data Modelling, Software Development Practice, FYP, Mobile
+              App Development
+            </div>
+          </div>
+        </div>
+        <div className="w-[1067px] h-[60px] left-0 top-[88px] absolute">
+          <div className="w-[1067px] h-[60px] left-0 top-0 absolute bg-white border-b border-[#e8ebf0]" />
+          <div className="w-3.5 h-3.5 left-0 top-[22px] absolute bg-white rounded-[3px] border border-[#e8ebf0]" />
+          <div className="w-[1031px] h-9 left-[36px] top-[12px] absolute">
+            <div className="left-0 top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Fabeha Saleem
+            </div>
+            <div className="left-[276px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              BSc Computer Science
+            </div>
+            <div className="left-[527px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Final Year
+            </div>
+            <div className="w-[363px] left-[668px] top-0 absolute text-black text-[15px] font-normal font-['Inter']">
+              Advance Data Modelling, Software Development Practice, FYP, Mobile
+              App Development
+            </div>
+          </div>
+        </div>
+        <div className="w-[1067px] h-[60px] left-0 top-[148px] absolute">
+          <div className="w-[1067px] h-[60px] left-0 top-0 absolute bg-white border-b border-[#e8ebf0]" />
+          <div className="w-3.5 h-3.5 left-0 top-[22px] absolute bg-white rounded-[3px] border border-[#e8ebf0]" />
+          <div className="w-[1031px] h-9 left-[36px] top-[12px] absolute">
+            <div className="left-0 top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Fabeha Saleem
+            </div>
+            <div className="left-[276px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              BSc Computer Science
+            </div>
+            <div className="left-[527px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Final Year
+            </div>
+            <div className="w-[363px] left-[668px] top-0 absolute text-black text-[15px] font-normal font-['Inter']">
+              Advance Data Modelling, Software Development Practice, FYP, Mobile
+              App Development
+            </div>
+          </div>
+        </div>
+        <div className="w-[1067px] h-[60px] left-0 top-[208px] absolute">
+          <div className="w-[1067px] h-[60px] left-0 top-0 absolute bg-white border-b border-[#e8ebf0]" />
+          <div className="w-3.5 h-3.5 left-0 top-[22px] absolute bg-white rounded-[3px] border border-[#e8ebf0]" />
+          <div className="w-[1031px] h-9 left-[36px] top-[12px] absolute">
+            <div className="left-0 top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Fabeha Saleem
+            </div>
+            <div className="left-[276px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              BSc Computer Science
+            </div>
+            <div className="left-[527px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Final Year
+            </div>
+            <div className="w-[363px] left-[668px] top-0 absolute text-black text-[15px] font-normal font-['Inter']">
+              Advance Data Modelling, Software Development Practice, FYP, Mobile
+              App Development
+            </div>
+          </div>
+        </div>
+        <div className="w-[1067px] h-[60px] left-0 top-[268px] absolute">
+          <div className="w-[1067px] h-[60px] left-0 top-0 absolute bg-white border-b border-[#e8ebf0]" />
+          <div className="w-3.5 h-3.5 left-0 top-[22px] absolute bg-white rounded-[3px] border border-[#e8ebf0]" />
+          <div className="w-[1031px] h-9 left-[36px] top-[12px] absolute">
+            <div className="left-0 top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Fabeha Saleem
+            </div>
+            <div className="left-[276px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              BSc Computer Science
+            </div>
+            <div className="left-[527px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Final Year
+            </div>
+            <div className="w-[363px] left-[668px] top-0 absolute text-black text-[15px] font-normal font-['Inter']">
+              Advance Data Modelling, Software Development Practice, FYP, Mobile
+              App Development
+            </div>
+          </div>
+        </div>
+        <div className="w-[1067px] h-[60px] left-0 top-[328px] absolute">
+          <div className="w-[1067px] h-[60px] left-0 top-0 absolute bg-white border-b border-[#e8ebf0]" />
+          <div className="w-3.5 h-3.5 left-0 top-[22px] absolute bg-white rounded-[3px] border border-[#e8ebf0]" />
+          <div className="w-[1031px] h-9 left-[36px] top-[12px] absolute">
+            <div className="left-0 top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Fabeha Saleem
+            </div>
+            <div className="left-[276px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              BSc Computer Science
+            </div>
+            <div className="left-[527px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Final Year
+            </div>
+            <div className="w-[363px] left-[668px] top-0 absolute text-black text-[15px] font-normal font-['Inter']">
+              Advance Data Modelling, Software Development Practice, FYP, Mobile
+              App Development
+            </div>
+          </div>
+        </div>
+        <div className="w-[1067px] h-[60px] left-0 top-[388px] absolute">
+          <div className="w-[1067px] h-[60px] left-0 top-0 absolute bg-white border-b border-[#e8ebf0]" />
+          <div className="w-3.5 h-3.5 left-0 top-[22px] absolute bg-white rounded-[3px] border border-[#e8ebf0]" />
+          <div className="w-[1031px] h-9 left-[36px] top-[12px] absolute">
+            <div className="left-0 top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Fabeha Saleem
+            </div>
+            <div className="left-[276px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              BSc Computer Science
+            </div>
+            <div className="left-[527px] top-[9px] absolute text-black text-[15px] font-normal font-['Inter']">
+              Final Year
+            </div>
+            <div className="w-[363px] left-[668px] top-0 absolute text-black text-[15px] font-normal font-['Inter']">
+              Advance Data Modelling, Software Development Practice, FYP, Mobile
+              App Development
+            </div>
+          </div>
+        </div>
+        <div className="w-[147px] h-[18px] left-[36px] top-[469px] absolute">
+          <div className="left-[22px] top-0 absolute text-[#616263] text-[15px] font-light font-['Inter']">
+            Add New Student
+          </div>
+          <div className="w-3 h-3 left-0 top-[3px] absolute flex-col justify-start items-start inline-flex overflow-hidden">
+            <div className="w-3 h-3 relative"></div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

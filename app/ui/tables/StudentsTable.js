@@ -1,6 +1,6 @@
 import Table from "../components/Table";
 
-export default function StudentsTable() {
+const StudentsTable = () => {
   const columns = [
     { key: "name", label: "Name" },
     { key: "course", label: "Course" },
@@ -17,19 +17,12 @@ export default function StudentsTable() {
     },
   ];
 
-  const handleAddStudent = () => ({
-    name: "New Student",
-    course: "New Course",
-    year: "N/A",
-    modules: "N/A",
-  });
-
   return (
     <Table
       data={initialData}
       columns={columns}
-      onAddRow={handleAddStudent}
       addButtonLabel="Add New Student"
     />
   );
-}
+};
+export default StudentsTable;
