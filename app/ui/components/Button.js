@@ -12,6 +12,8 @@ const Button = ({ variant = "primary", children, onClick }) => {
     actionOutlined:
       "px-4 h-9 bg-white rounded-[7px] border border-[#e8ebf0] text-[#48515c] text-[15px] font-light font-['Inter']",
     textOnly: "text-[#616263] text-[15px] font-light font-['Inter']",
+    iconOnlyOutlined: "w-8 h-8 rounded-full border border-[#e8ebf0]",
+    iconOnlyFilled: "w-8 h-8 rounded-full bg-[#54b5f6]",
   };
 
   const styles = `${baseStyle} ${variantStyles[variant]}`;

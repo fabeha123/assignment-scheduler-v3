@@ -52,16 +52,26 @@ export async function POST(request) {
   }
 }
 
-export async function GET() {
+export async function GET(request) {
   try {
     const sql = neon(process.env.DATABASE_URL);
 
-    // Fetch courses from the database
-    const courses = await sql(`
+    // Parse query params to check if 'onlyNames' is requested
+    const { searchParams } = new URL(request.url);
+    const onlyNames = searchParams.get("onlyNames");
+
+    let query = `
       SELECT course_id, name, start_date, end_date, duration
       FROM course
       ORDER BY created_at DESC
-    `);
+    `;
+
+    if (onlyNames) {
+      query = `SELECT name FROM course ORDER BY created_at DESC`;
+    }
+
+    // Fetch courses based on query condition
+    const courses = await sql(query);
 
     return new Response(JSON.stringify({ success: true, data: courses }), {
       status: 200,
