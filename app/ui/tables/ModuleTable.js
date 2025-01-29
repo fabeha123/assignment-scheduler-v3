@@ -4,25 +4,34 @@ import Table from "../components/Table";
 
 const ModuleTable = ({ data, openModal }) => {
   const columns = [
-    { key: "name", label: "Name" },
-    { key: "start_date", label: "Start Date" },
-    { key: "end_date", label: "End Date" },
-    { key: "duration", label: "Duration" },
+    { key: "module_name", label: "Module Name" },
+    { key: "module_code", label: "Module Code" },
+    { key: "credits", label: "Credits" },
+    { key: "is_core", label: "Is Core?" },
+    { key: "courses", label: "Courses" },
   ];
 
   const formattedData = data.map((row) => ({
     ...row,
-    start_date: row.start_date ? row.start_date.split("T")[0] : "—",
-    end_date: row.end_date ? row.end_date.split("T")[0] : "—",
+    courses: Array.isArray(row.courses)
+      ? row.courses.join(", ")
+      : row.courses || "—",
   }));
 
   const addButton = {
-    label: "Add New Course",
+    label: "Add New Module",
     variant: "textOnly",
     onClick: openModal,
   };
 
-  return <Table data={formattedData} columns={columns} addButton={addButton} />;
+  return (
+    <Table
+      data={formattedData}
+      columns={columns}
+      addButton={addButton}
+      gridTemplateColumns="1.25fr 0.75fr 0.5fr 0.5fr 2fr"
+    />
+  );
 };
 
 export default ModuleTable;

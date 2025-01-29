@@ -2,31 +2,31 @@
 
 import { useState, useEffect } from "react";
 import Subheader from "../../ui/components/Subheader";
-import CourseTable from "../../ui/tables/CourseTable";
-import CourseModal from "../../ui/modals/CourseModal";
-import AddCourseForm from "../../ui/forms/AddCourseForm";
+import ModuleTable from "../../ui/tables/ModuleTable";
+import ModuleModal from "../../ui/modals/ModuleModal";
+import AddModuleForm from "../../ui/forms/AddModuleForm";
 
 const ModuleScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [courses, setCourses] = useState([]);
+  const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  // Function to fetch courses from the API
-  const fetchCourses = async () => {
+  // Function to fetch modules from the API
+  const fetchModules = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/course", { method: "GET" });
+      const res = await fetch("/api/module", { method: "GET" });
       const data = await res.json();
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to fetch courses");
       }
 
-      setCourses(data.data);
+      setModules(data.data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -35,7 +35,7 @@ const ModuleScreen = () => {
   };
 
   useEffect(() => {
-    fetchCourses();
+    fetchModules();
   }, []);
 
   return (
@@ -54,25 +54,25 @@ const ModuleScreen = () => {
         />
       </div>
 
-      {/* Course Table */}
+      {/* Module Table */}
       {loading ? (
-        <p className="text-center mt-6">Loading courses...</p>
+        <p className="text-center mt-6">Loading modules...</p>
       ) : error ? (
         <p className="text-center text-red-600 mt-6">{error}</p>
       ) : (
-        <CourseTable data={courses} openModal={openModal} />
+        <ModuleTable data={modules} openModal={openModal} />
       )}
 
       {/* Modal */}
-      <CourseModal isOpen={isModalOpen} onClose={closeModal}>
-        <AddCourseForm
+      <ModuleModal isOpen={isModalOpen} onClose={closeModal}>
+        <AddModuleForm
           onSuccess={() => {
-            fetchCourses();
+            fetchModules();
             closeModal();
           }}
           onClose={closeModal}
         />
-      </CourseModal>
+      </ModuleModal>
     </div>
   );
 };

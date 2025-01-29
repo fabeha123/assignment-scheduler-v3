@@ -1,14 +1,21 @@
 "use client";
 
 import Button from "./Button";
+import React from "react";
 
-export default function Table({ data = [], columns = [], addButton = {} }) {
+export default function Table({
+  data = [],
+  columns = [],
+  addButton = {},
+  gridTemplateColumns = "2fr 1fr 1fr 3fr",
+}) {
   return (
     <div className="w-full flex justify-center mt-6">
       <div className="w-[95%] max-w-[1440px] bg-white border border-[#e8ebf0] rounded-md overflow-hidden">
         {/* Table Header */}
         <div
-          className={`grid grid-cols-[2fr_1fr_1fr_3fr] bg-white border-b border-[#e8ebf0] px-4 py-2 text-sm font-light text-black`}
+          className="grid bg-white border-b border-[#e8ebf0] px-4 py-2 text-sm font-light text-black"
+          style={{ gridTemplateColumns }}
         >
           {columns.map((col) => (
             <div key={col.key} className="text-left">
@@ -21,39 +28,58 @@ export default function Table({ data = [], columns = [], addButton = {} }) {
         {data.map((row, rowIndex) => (
           <div
             key={rowIndex}
-            className="grid grid-cols-[2fr_1fr_1fr_3fr] border-b border-[#e8ebf0] px-4 py-3 text-sm text-black relative"
+            className="grid border-b border-[#e8ebf0] px-4 py-3 text-sm text-black"
+            style={{ gridTemplateColumns }}
           >
-            {columns.map((col) => (
-              <div key={col.key} className="flex items-center">
-                <span>{row[col.key] || "—"}</span>
-              </div>
-            ))}
-
-            {/* Action Buttons */}
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
-              <Button
-                variant="actionOutlined"
-                onClick={() => console.log(`Edit row ${rowIndex}`)}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="actionBlueFilled"
-                onClick={() => console.log(`Delete row ${rowIndex}`)}
-              >
-                Delete
-              </Button>
-            </div>
+            {columns.map((col, colIndex) => {
+              // last column in the array to have "text + buttons":
+              if (colIndex === columns.length - 1) {
+                return (
+                  <div
+                    key={col.key}
+                    className="flex items-center justify-between w-full"
+                  >
+                    <span className="pr-2">{row[col.key] ?? "—"}</span>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="iconOnlyFilled"
+                        onClick={() => console.log(`Edit row ${rowIndex}`)}
+                      >
+                        <img
+                          src="/icons/fi_2985043.svg"
+                          className="w-4 h-4"
+                          alt="Edit"
+                        />
+                      </Button>
+                      <Button
+                        variant="iconOnlyOutlined"
+                        onClick={() => console.log(`Delete row ${rowIndex}`)}
+                      >
+                        <img
+                          src="/icons/fi_2976286.svg"
+                          className="w-3 h-3"
+                          alt="Delete"
+                        />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              } else {
+                return (
+                  <div key={col.key} className="flex items-center">
+                    <span>{row[col.key] ?? "—"}</span>
+                  </div>
+                );
+              }
+            })}
           </div>
         ))}
 
-        {/* Add Button */}
+        {/* "Add New" Button at the bottom */}
         <div className="p-4">
           <Button
             variant={addButton.variant || "textOnly"}
-            onClick={
-              addButton.onClick || (() => console.log("Button clicked!"))
-            }
+            onClick={addButton.onClick || (() => console.log("Add clicked!"))}
           >
             {addButton.label || "Add New Item"}
           </Button>
