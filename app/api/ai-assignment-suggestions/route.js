@@ -7,7 +7,7 @@ export async function POST(request) {
 
     const sql = neon(process.env.DATABASE_URL);
 
-    const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
     const assignmentResponse = await fetch(
       `${baseURL}/api/assignments?onlyScheduleCheck=true&module=${module}`
