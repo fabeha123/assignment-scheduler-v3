@@ -1,4 +1,5 @@
 import { neon } from "@neondatabase/serverless";
+import { formatToDDMMYYYY } from "@/app/lib/formatDate";
 
 export async function POST(request) {
   try {
@@ -47,7 +48,7 @@ Now, schedule a new assignment:
 - Brief: ${brief}
 
 Your task:
-1. Suggest an improved start and end date ensuring a **2-week gap** between existing assignments.
+1. Suggest an improved start and end date ensuring a **2-week gap** between existing assignments, the dates must be in dd-mm-yyyy format.
 2. Consider the complexity of the assignment when deciding the duration.
 3. Use the below Example Output to respond (no extra text):
 
