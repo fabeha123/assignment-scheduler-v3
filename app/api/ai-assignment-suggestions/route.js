@@ -1,5 +1,4 @@
 import { neon } from "@neondatabase/serverless";
-import { formatToDDMMYYYY } from "@/app/lib/formatDate";
 
 export async function POST(request) {
   try {
