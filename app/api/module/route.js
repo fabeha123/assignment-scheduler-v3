@@ -83,24 +83,25 @@ export async function POST(request) {
   }
 }
 
-export async function GET() {
+export async function GET(request) {
   try {
     const sql = neon(process.env.DATABASE_URL);
 
-    const modules = await sql(`
-      SELECT
-        m.module_id,
-        m.module_name,
-        m.module_code,
-        m.credits,
-        ARRAY_AGG(c.name) AS courses,
-        CASE WHEN BOOL_OR(cm.is_core) THEN 'Yes' ELSE 'No' END AS is_core
-      FROM modules m
-      LEFT JOIN courses_modules cm ON m.module_id = cm.module_id
-      LEFT JOIN course c ON cm.course_id = c.course_id
-      GROUP BY m.module_id
-      ORDER BY m.module_id ASC;
-    `);
+    // Parse query params to check if onlyNames is requested
+    const { searchParams } = new URL(request.url);
+    const onlyNames = searchParams.get("onlyNames");
+
+    let query = `
+      SELECT module_id, module_name, module_code, credits
+      FROM modules
+    `;
+
+    if (onlyNames) {
+      query = `SELECT module_name FROM modules ORDER BY module_name ASC`;
+    }
+
+    // Fetch modules based on query condition
+    const modules = await sql(query);
 
     return new Response(JSON.stringify({ success: true, data: modules }), {
       status: 200,
@@ -108,8 +109,12 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error in /api/modules GET:", error);
+
     return new Response(
-      JSON.stringify({ success: false, message: "Failed to fetch modules" }),
+      JSON.stringify({
+        success: false,
+        message: "Failed to fetch modules",
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
