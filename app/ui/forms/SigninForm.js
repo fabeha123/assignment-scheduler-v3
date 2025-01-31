@@ -11,7 +11,6 @@ const SigninForm = ({ onSuccess }) => {
 
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  //adding random functions for now -- need to edit once database is ready
   const handleChange = (name, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -23,7 +22,6 @@ const SigninForm = ({ onSuccess }) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
 
-    // Call a parent handler if provided
     if (onSuccess) {
       onSuccess(formData);
     }
@@ -34,16 +32,24 @@ const SigninForm = ({ onSuccess }) => {
   };
 
   return (
-    <Form onSubmit={handleSubmit} submitLabel="Start Scheduling">
-      <Form.InputText
-        icon="/icons/fi_2099100.svg"
-        name="username"
-        value={formData.username}
-        onChange={(e) => handleChange("username", e.target.value)}
-        required
-        placeholder="Username"
-        type="text"
-      />
+    <Form
+      onSubmit={handleSubmit}
+      submitLabel="Start Scheduling"
+      buttonVariant="primary"
+    >
+      {/* Add a wrapper div with margin-bottom for spacing */}
+      <div className="mb-5">
+        <Form.InputText
+          icon="/icons/fi_2099100.svg"
+          name="username"
+          value={formData.username}
+          onChange={(e) => handleChange("username", e.target.value)}
+          required
+          placeholder="Username"
+          type="text"
+        />
+      </div>
+
       <div className="relative">
         <Form.InputText
           icon="/icons/fi_103089.svg"

@@ -77,27 +77,29 @@ const SignupForm = ({ onSuccess }) => {
 
   return (
     <Form onSubmit={handleSubmit} submitLabel="Start Scheduling">
-      <Form.InputText
-        icon="/icons/fi_15678795.svg"
-        name="fullname"
-        value={formData.fullname}
-        onChange={(e) => handleChange("fullname", e.target.value)}
-        required
-        placeholder="Full Name"
-        type="text"
-      />
-
-      <Form.InputText
-        icon="/icons/fi_2099100.svg"
-        name="email"
-        value={formData.email}
-        onChange={(e) => handleChange("email", e.target.value)}
-        required
-        placeholder="Email"
-        type="email"
-      />
-
-      <div className="relative">
+      <div className="mb-5">
+        <Form.InputText
+          icon="/icons/fi_15678795.svg"
+          name="fullname"
+          value={formData.fullname}
+          onChange={(e) => handleChange("fullname", e.target.value)}
+          required
+          placeholder="Full Name"
+          type="text"
+        />
+      </div>
+      <div className="mb-5">
+        <Form.InputText
+          icon="/icons/fi_2099100.svg"
+          name="email"
+          value={formData.email}
+          onChange={(e) => handleChange("email", e.target.value)}
+          required
+          placeholder="Email"
+          type="email"
+        />
+      </div>
+      <div className="relative mb-5">
         <Form.InputText
           icon="/icons/fi_103089.svg"
           name="password"

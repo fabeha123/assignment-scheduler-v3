@@ -10,27 +10,29 @@ const SignupScreen = () => {
   };
 
   return (
-    <>
-      <div className="mb-10">
-        <div className="text-black text-5xl font-semibold font-['Inter']">
-          Sign up
+    <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="w-[440px] h-auto p-4">
+        <div className="mb-10">
+          <div className="text-black text-5xl font-semibold font-['Inter']">
+            Sign up
+          </div>
+          <div className="mt-5">
+            <span className="text-black text-base font-medium font-['Inter']">
+              Create a new account and start scheduling
+            </span>
+          </div>
         </div>
-        <div className="mt-5">
-          <span className="text-black text-base font-medium font-['Inter']">
-            Create a new account and start scheduling
-          </span>
+
+        <SignupForm onSuccess={handleFormSuccess} />
+
+        <div className="mt-5 text-base font-['Inter'] text-center w-full">
+          <span className="text-[#48515c] font-light">Already a member? </span>
+          <Link href="/signin" className="text-black font-bold">
+            Sign in
+          </Link>
         </div>
       </div>
-
-      <SignupForm onSuccess={handleFormSuccess} />
-
-      <div className="mt-5 text-base font-['Inter'] text-center w-full">
-        <span className="text-[#48515c] font-light">Already a member? </span>
-        <Link href="/signin" className="text-black font-bold">
-          Sign in
-        </Link>
-      </div>
-    </>
+    </div>
   );
 };
 

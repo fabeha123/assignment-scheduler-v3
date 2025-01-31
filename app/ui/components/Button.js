@@ -6,7 +6,7 @@ const Button = ({ variant = "primary", children, onClick }) => {
 
   const variantStyles = {
     primary:
-      "px-6 h-[55px] bg-[#6ec5ff] rounded-[100px] text-white text-base font-bold font-['Inter']",
+      "w-full h-[55px] bg-[#6ec5ff] rounded-[100px] text-white text-base font-bold font-['Inter'] px-6",
     actionBlueFilled:
       "px-4 h-9 bg-[#54b5f6] rounded-[7px] text-white text-[15px] font-normal font-['Inter']",
     actionOutlined:
