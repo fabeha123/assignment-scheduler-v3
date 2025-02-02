@@ -3,11 +3,12 @@ import { neon } from "@neondatabase/serverless";
 export async function POST(request) {
   try {
     // Parse JSON from the request body
-    const { name, start_date, end_date, duration } = await request.json();
+    const { name, course_code, start_date, end_date, duration } =
+      await request.json();
     const sql = neon(process.env.DATABASE_URL);
 
     // Validate input
-    if (!name || !start_date || !end_date || !duration) {
+    if (!name || !course_code || !start_date || !end_date || !duration) {
       return new Response(
         JSON.stringify({
           success: false,
@@ -23,10 +24,10 @@ export async function POST(request) {
     // Insert data into the course table
     await sql(
       `
-      INSERT INTO course (name, start_date, end_date, duration)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO course (name, course_code, start_date, end_date, duration)
+      VALUES ($1, $2, $3, $4, $5)
       `,
-      [name, start_date, end_date, duration]
+      [name, course_code, start_date, end_date, duration]
     );
 
     return new Response(
@@ -61,13 +62,13 @@ export async function GET(request) {
     const onlyNames = searchParams.get("onlyNames");
 
     let query = `
-      SELECT course_id, name, start_date, end_date, duration
+      SELECT course_code, name, course_code, start_date, end_date, duration
       FROM course
       ORDER BY created_at DESC
     `;
 
     if (onlyNames) {
-      query = `SELECT name FROM course ORDER BY created_at DESC`;
+      query = `SELECT name, course_code FROM course ORDER BY created_at DESC`;
     }
 
     // Fetch courses based on query condition

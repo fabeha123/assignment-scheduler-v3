@@ -29,9 +29,9 @@ export async function POST(request) {
       );
     }
 
-    // Fetch the module_id using the module name
+    // Fetch the module_code using the module name
     const moduleResult = await sql(
-      `SELECT module_id FROM modules WHERE module_name = $1`,
+      `SELECT module_code FROM modules WHERE module_name = $1`,
       [module]
     );
 
@@ -48,12 +48,12 @@ export async function POST(request) {
       );
     }
 
-    const moduleId = moduleResult[0].module_id;
+    const moduleId = moduleResult[0].module_code;
 
     // Insert assignment into the assignments table
     const assignmentResult = await sql(
       `
-      INSERT INTO assignments (name, weightage, module_id, start_date, end_date, brief)
+      INSERT INTO assignments (name, weightage, module_code, start_date, end_date, brief)
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING assignment_id
       `,
@@ -151,7 +151,7 @@ export async function GET(request) {
 
       // Fetch module ID
       const moduleResult = await sql(
-        `SELECT module_id FROM modules WHERE module_name = $1`,
+        `SELECT module_code FROM modules WHERE module_name = $1`,
         [moduleName]
       );
 
@@ -162,11 +162,11 @@ export async function GET(request) {
         );
       }
 
-      const moduleId = moduleResult[0].module_id;
+      const moduleId = moduleResult[0].module_code;
 
       // Fetch all courses linked to the module
       const courseResult = await sql(
-        `SELECT course_id FROM courses_modules WHERE module_id = $1`,
+        `SELECT course_code FROM courses_modules WHERE module_code = $1`,
         [moduleId]
       );
 
@@ -180,23 +180,23 @@ export async function GET(request) {
         );
       }
 
-      const courseIds = courseResult.map((c) => c.course_id);
+      const courseIds = courseResult.map((c) => c.course_code);
 
       // Fetch all modules in the same courses
       const relatedModulesResult = await sql(
-        `SELECT module_id FROM courses_modules WHERE course_id = ANY($1)`,
+        `SELECT module_code FROM courses_modules WHERE course_code = ANY($1)`,
         [courseIds]
       );
 
-      const relatedModuleIds = relatedModulesResult.map((m) => m.module_id);
+      const relatedModuleIds = relatedModulesResult.map((m) => m.module_code);
 
       // Fetch assignments within 1 month range
       assignments = await sql(
         `
         SELECT a.assignment_id, a.name AS assignment_name, a.start_date, a.end_date, m.module_name
         FROM assignments a
-        LEFT JOIN modules m ON a.module_id = m.module_id
-        WHERE a.module_id = ANY($1)
+        LEFT JOIN modules m ON a.module_code = m.module_code
+        WHERE a.module_code = ANY($1)
         AND (
           (a.start_date >= $2 AND a.start_date <= $3)
           AND (a.end_date >= $2 AND a.end_date <= $3)
@@ -208,7 +208,7 @@ export async function GET(request) {
     } else if (onlyScheduleCheck && moduleName) {
       // Fetch all assignments in related courses/modules (AI Scheduling use case)
       const moduleResult = await sql(
-        `SELECT module_id FROM modules WHERE module_name = $1`,
+        `SELECT module_code FROM modules WHERE module_name = $1`,
         [moduleName]
       );
 
@@ -219,11 +219,11 @@ export async function GET(request) {
         );
       }
 
-      const moduleId = moduleResult[0].module_id;
+      const moduleId = moduleResult[0].module_code;
 
       // Fetch all courses linked to the module
       const courseResult = await sql(
-        `SELECT course_id FROM courses_modules WHERE module_id = $1`,
+        `SELECT course_code FROM courses_modules WHERE module_code = $1`,
         [moduleId]
       );
 
@@ -237,23 +237,23 @@ export async function GET(request) {
         );
       }
 
-      const courseIds = courseResult.map((c) => c.course_id);
+      const courseIds = courseResult.map((c) => c.course_code);
 
       // Fetch all modules in the same courses
       const relatedModulesResult = await sql(
-        `SELECT module_id FROM courses_modules WHERE course_id = ANY($1)`,
+        `SELECT module_code FROM courses_modules WHERE course_code = ANY($1)`,
         [courseIds]
       );
 
-      const relatedModuleIds = relatedModulesResult.map((m) => m.module_id);
+      const relatedModuleIds = relatedModulesResult.map((m) => m.module_code);
 
       // Fetch ALL assignments for these modules (no date restriction)
       assignments = await sql(
         `
         SELECT a.assignment_id, a.name AS assignment_name, a.start_date, a.end_date, m.module_name
         FROM assignments a
-        LEFT JOIN modules m ON a.module_id = m.module_id
-        WHERE a.module_id = ANY($1)
+        LEFT JOIN modules m ON a.module_code = m.module_code
+        WHERE a.module_code = ANY($1)
         ORDER BY a.start_date ASC
         `,
         [relatedModuleIds]
@@ -263,7 +263,7 @@ export async function GET(request) {
       assignments = await sql(`
         SELECT a.assignment_id, a.name AS assignment_name, a.weightage, a.start_date, a.end_date, m.module_name
         FROM assignments a
-        LEFT JOIN modules m ON a.module_id = m.module_id
+        LEFT JOIN modules m ON a.module_code = m.module_code
         ORDER BY a.start_date ASC
       `);
     }

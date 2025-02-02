@@ -101,7 +101,7 @@ const InputSelect = ({
           className="bg-transparent outline-none text-gray-500 text-base font-normal font-['Inter'] w-full"
         >
           <option value="" disabled className="text-gray-500">
-            Select Modules
+            Select...
           </option>
           {options.map((option, index) => (
             <option key={index} value={option.value} className="text-black">
