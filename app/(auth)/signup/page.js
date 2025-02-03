@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const SignupScreen = () => {
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const [token, setToken] = useState(null);
 
   const [preloadedData, setPreloadedData] = useState({
     fullname: "",
@@ -15,6 +15,16 @@ const SignupScreen = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const urlToken = searchParams.get("token");
+    if (urlToken) {
+      setToken(urlToken);
+    } else {
+      setError("Invalid signup link.");
+      setLoading(false);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (token) {
@@ -29,9 +39,6 @@ const SignupScreen = () => {
         })
         .catch(() => setError("Failed to verify token."))
         .finally(() => setLoading(false));
-    } else {
-      setError("Invalid signup link.");
-      setLoading(false);
     }
   }, [token]);
 
