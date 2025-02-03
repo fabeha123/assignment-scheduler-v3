@@ -1,16 +1,13 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import useClientSearchParams from "@/app/hooks/useClientSearchParams";
 import SignupForm from "@/app/ui/forms/SignupForm";
 import Link from "next/link";
 
 const SignupScreen = () => {
-  const searchParams = useSearchParams();
+  const searchParams = useClientSearchParams(); // Use the custom hook
   const [token, setToken] = useState(null);
-
   const [preloadedData, setPreloadedData] = useState({
     fullname: "",
     email: "",
@@ -19,10 +16,9 @@ const SignupScreen = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const urlToken = searchParams.get("token");
-    if (urlToken) {
-      setToken(urlToken);
-    } else {
+    if (searchParams && searchParams.token) {
+      setToken(searchParams.token);
+    } else if (searchParams !== null) {
       setError("Invalid signup link.");
       setLoading(false);
     }
