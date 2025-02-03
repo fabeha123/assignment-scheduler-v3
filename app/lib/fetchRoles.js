@@ -6,7 +6,7 @@ export async function fetchRoles() {
     const data = await response.json();
     if (data.success) {
       return data.data.map((role) => ({
-        value: role.role_name,
+        value: role.role_id,
         label: role.role_name,
       }));
     } else {

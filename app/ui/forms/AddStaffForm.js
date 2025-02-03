@@ -22,7 +22,6 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Fetch courses and roles when the component mounts
   useEffect(() => {
     const getCourses = async () => {
       try {
@@ -48,51 +47,52 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
     getRoles();
   }, []);
 
-  // Fetch modules based on selected courses in real-time
   useEffect(() => {
-    const fetchModules = async () => {
-      console.log("📌 formData.courses BEFORE fetch:", formData.courses);
-
+    const getModules = async () => {
       if (!formData.courses || formData.courses.length === 0) {
-        console.warn("⚠️ No courses selected, resetting modules.");
         setModules([]);
+        setFormData((prev) => ({ ...prev, modules: [] })); // Reset modules in formData
         return;
       }
 
       setLoadingModules(true);
       try {
-        const moduleList = await fetchModulesByCourses(formData.courses);
-        console.log("✅ Modules fetched:", moduleList);
-        setModules(moduleList);
+        const fetchedModules = await fetchModulesByCourses(
+          formData.courses.map((c) => c.value)
+        );
+
+        const selectedModules = formData.modules
+          .map(
+            (module) =>
+              fetchedModules.find((m) => m.value === module.value) || module
+          )
+          .filter(Boolean);
+
+        setModules(fetchedModules);
+        setFormData((prev) => ({ ...prev, modules: selectedModules }));
       } catch (error) {
-        console.error("❌ Error fetching modules:", error);
         setErrorMessage("Failed to fetch modules");
       } finally {
         setLoadingModules(false);
       }
     };
 
-    fetchModules();
+    getModules();
   }, [formData.courses]);
 
-  // Handle general form input changes
   const handleChange = (name, value) => {
-    console.log(`📌 handleChange called - ${name}:`, value);
+    setFormData((prev) => {
+      let updatedFormData = { ...prev, [name]: value || [] };
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value || [],
-    }));
+      if (name === "courses") {
+        setModules([]);
+        updatedFormData.modules = [];
+      }
 
-    // If courses are changed, reset modules
-    if (name === "courses") {
-      console.log("📌 Courses changed, resetting modules.");
-      setModules([]);
-      setFormData((prev) => ({ ...prev, modules: [] }));
-    }
+      return updatedFormData;
+    });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccessMessage("");
@@ -107,8 +107,12 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
       full_name: formData.full_name,
       email: formData.email,
       role: formData.role,
-      courses: formData.courses.map((course) => course.value),
-      modules: formData.modules.map((module) => module.value),
+      courses: formData.courses.map((course) =>
+        typeof course === "object" && course.value ? course.value : course
+      ),
+      modules: formData.modules.map((module) =>
+        typeof module === "object" && module.value ? module.value : module
+      ),
     };
 
     try {
@@ -127,7 +131,6 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
       setSuccessMessage("Staff added successfully");
       if (onSuccess) onSuccess(dataToSend);
 
-      // Reset the form fields
       setFormData({
         full_name: "",
         email: "",
@@ -138,7 +141,6 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
 
       if (onClose) onClose();
     } catch (error) {
-      console.error("Error submitting form:", error);
       setErrorMessage("An error occurred. Please try again later.");
     }
   };
@@ -169,7 +171,7 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
         <Form.InputSelect
           label="Role"
           value={formData.role}
-          onChange={(val) => handleChange("role", val.value)}
+          onChange={(val) => handleChange("role", val)}
           required
           options={roles}
         />
@@ -179,7 +181,9 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
         <Form.InputMultiSelect
           label="Courses"
           value={formData.courses}
-          onChange={(value) => handleChange("courses", value)}
+          onChange={(value) => {
+            handleChange("courses", value);
+          }}
           options={courses}
         />
         <Form.InputMultiSelect
@@ -187,7 +191,7 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
           value={formData.modules}
           onChange={(value) => handleChange("modules", value)}
           options={modules}
-          isDisabled={loadingModules} // Only disable while fetching
+          isDisabled={loadingModules}
           loading={loadingModules}
         />
       </div>

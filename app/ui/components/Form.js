@@ -34,6 +34,7 @@ const InputText = ({
   required = false,
   placeholder = "",
   type = "text",
+  readOnly,
 }) => {
   return (
     <div className="relative w-full h-[50px] bg-[#f4f4f4] rounded-[13px] flex items-center px-4">
@@ -45,6 +46,7 @@ const InputText = ({
         onChange={onChange}
         placeholder={placeholder}
         required={required}
+        readOnly={readOnly}
         className="bg-transparent outline-none text-black text-base font-normal font-['Inter'] flex-1"
       />
     </div>
@@ -115,23 +117,37 @@ const InputSelect = ({
   );
 };
 
-// Multi-select Component
 const InputMultiSelect = ({
-  label = "Courses",
+  label,
   options = [],
   value = [],
   onChange,
+  isDisabled = false,
+  loading = false,
 }) => {
+  const selectedItems = Array.isArray(value) ? value : [];
+
   const handleSelect = (selectedValue) => {
-    if (value.includes(selectedValue)) {
-      onChange(value.filter((item) => item !== selectedValue));
-    } else {
-      onChange([...value, selectedValue]);
+    const selectedOption = options.find(
+      (option) => option.value.toString() === selectedValue.toString()
+    );
+    if (!selectedOption) return;
+
+    if (
+      !selectedItems.some(
+        (item) => item.value.toString() === selectedOption.value.toString()
+      )
+    ) {
+      onChange([...selectedItems, selectedOption]);
     }
   };
 
   const handleRemove = (removedValue) => {
-    onChange(value.filter((item) => item !== removedValue));
+    onChange(
+      selectedItems.filter(
+        (item) => item.value.toString() !== removedValue.toString()
+      )
+    );
   };
 
   return (
@@ -140,26 +156,15 @@ const InputMultiSelect = ({
         {label}
       </label>
 
-      {/* Field for browser validation */}
-      <input
-        type="text"
-        name="courses"
-        required
-        className="hidden"
-        value={value.length ? value.join(",") : ""}
-        onChange={() => {}}
-      />
-
-      {/* Visible custom single select */}
       <div className="w-full h-[45px] bg-[#f4f4f4] rounded-[13px] px-4 flex items-center">
         <select
           onChange={(e) => handleSelect(e.target.value)}
-          value="" // Always reset to "" so user can pick multiple
-          className="bg-transparent outline-none text-gray-500 text-base
-                     font-normal w-full cursor-pointer"
+          value=""
+          disabled={isDisabled || loading}
+          className="bg-transparent outline-none text-gray-500 text-base font-normal w-full cursor-pointer"
         >
           <option value="" disabled hidden>
-            {value.length === 0 ? label : "Add more..."}
+            {selectedItems.length === 0 ? label : "Add more..."}
           </option>
           {options.map((option) => (
             <option key={option.value} value={option.value}>
@@ -169,22 +174,20 @@ const InputMultiSelect = ({
         </select>
       </div>
 
-      {/* Selected tags */}
-      {value.length > 0 && (
+      {selectedItems.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-2">
-          {value.map((item) => (
+          {selectedItems.map((item) => (
             <div
-              key={item}
-              className="flex items-center w-fit px-3 h-[36px]
-                         bg-white border border-[#e8ebf0] rounded-[13px]"
+              key={item.value}
+              className="flex items-center w-fit px-3 h-[36px] bg-white border border-[#e8ebf0] rounded-[13px]"
             >
               <span className="text-black text-base font-normal truncate">
-                {item}
+                {item.label}
               </span>
               <button
                 type="button"
                 className="ml-2 text-black hover:text-red-600"
-                onClick={() => handleRemove(item)}
+                onClick={() => handleRemove(item.value)}
               >
                 ✕
               </button>

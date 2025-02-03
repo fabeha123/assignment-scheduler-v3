@@ -1,56 +1,50 @@
 import { neon } from "@neondatabase/serverless";
+import bcrypt from "bcryptjs"; // ✅ Use bcryptjs instead
 
 export async function POST(request) {
   try {
-    const { fullname, email, password } = await request.json();
     const sql = neon(process.env.DATABASE_URL);
 
-    // Attempt the insertion
-    await sql(
-      `
-      INSERT INTO staff (full_name, email, password)
-      VALUES ($1, $2, $3)
-      `,
-      [fullname, email, password]
-    );
+    const { token, password } = await request.json();
 
-    // Return success response
-    return new Response(
-      JSON.stringify({ success: true, message: "User created" }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-  } catch (error) {
-    console.error("Error in /api/signup:", error);
-
-    // Detect unique constraint violation
-    // Postgres often returns error code '23505' for unique violations
-    // or the error message might contain "duplicate key value violates unique constraint"
-    if (
-      error.message.includes("duplicate key value") ||
-      error.code === "23505"
-    ) {
+    if (!token || !password) {
       return new Response(
-        JSON.stringify({
-          success: false,
-          message: "User with this email already exists.",
-        }),
-        {
-          status: 409,
-          headers: { "Content-Type": "application/json" },
-        }
+        JSON.stringify({ message: "Invalid token or password" }),
+        { status: 400 }
       );
     }
 
-    // else return a generic server error
+    const staffQuery = `
+      SELECT staff_id FROM staff 
+      WHERE activation_token = $1 AND status = 'Pending';
+    `;
+    const staffResult = await sql(staffQuery, [token]);
+
+    if (!staffResult || staffResult.length === 0) {
+      return new Response(
+        JSON.stringify({ message: "Invalid or expired token" }),
+        { status: 400 }
+      );
+    }
+
+    const staffId = staffResult[0].staff_id;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const updateQuery = `
+      UPDATE staff
+      SET password = $1, status = 'Active', activation_token = NULL
+      WHERE staff_id = $2;
+    `;
+    await sql(updateQuery, [hashedPassword, staffId]);
+
     return new Response(
-      JSON.stringify({ success: false, message: "Internal server error" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
+      JSON.stringify({ message: "Signup completed successfully" }),
+      { status: 200 }
     );
+  } catch (error) {
+    return new Response(JSON.stringify({ message: "Internal server error" }), {
+      status: 500,
+    });
   }
 }

@@ -23,54 +23,28 @@ export async function POST(request) {
 
     const sql = neon(process.env.DATABASE_URL);
 
-    // Extract course codes from input
-    const extractedCourseCodes = courses
-      .map((course) => course.match(/\((.*?)\)/)?.[1])
-      .filter(Boolean);
+    const courseCodes = courses.map((course) => course.value);
 
-    if (extractedCourseCodes.length !== courses.length) {
+    if (courseCodes.some((code) => code.length > 50)) {
       return new Response(
-        JSON.stringify({ success: false, message: "Invalid course format." }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+        JSON.stringify({ success: false, message: "Course code too long" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Validate extracted course codes
-    const placeholders = extractedCourseCodes
-      .map((_, i) => `$${i + 1}`)
-      .join(", ");
-    const courseResult = await sql(
-      `SELECT course_code FROM course WHERE course_code IN (${placeholders})`,
-      extractedCourseCodes
-    );
-
-    if (courseResult.length !== extractedCourseCodes.length) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: "One or more course codes are invalid.",
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    // Insert into modules
     await sql(
-      `INSERT INTO modules (module_code, module_name, credits) VALUES ($1, $2, $3) ON CONFLICT (module_code) DO NOTHING`,
+      `INSERT INTO modules (module_code, module_name, credits) 
+       VALUES ($1, $2, $3) 
+       ON CONFLICT (module_code) DO NOTHING`,
       [module_code, module_name, credits]
     );
 
-    // Insert into courses_modules
     await Promise.all(
-      extractedCourseCodes.map(async (course_code) => {
+      courseCodes.map(async (course_code) => {
         await sql(
-          `INSERT INTO courses_modules (module_code, course_code, is_core) VALUES ($1, $2, $3) ON CONFLICT (module_code, course_code) DO UPDATE SET is_core = $3`,
+          `INSERT INTO courses_modules (module_code, course_code, is_core) 
+           VALUES ($1, $2, $3) 
+           ON CONFLICT (module_code, course_code) DO UPDATE SET is_core = $3`,
           [module_code, course_code, is_core]
         );
       })
@@ -84,7 +58,7 @@ export async function POST(request) {
       }
     );
   } catch (error) {
-    console.error("Error in /api/modules POST:", error);
+    console.error(" Error in /api/modules POST:", error);
     return new Response(
       JSON.stringify({ success: false, message: "Internal server error" }),
       {
@@ -99,9 +73,10 @@ export async function GET(request) {
   try {
     const sql = neon(process.env.DATABASE_URL);
 
-    // Parse query params
+    // Query params -> change them [ ] format to make it short and nice to understand (next supports [])
     const { searchParams } = new URL(request.url);
     const onlyNames = searchParams.get("onlyNames");
+    const coursesParam = searchParams.get("courses"); // New param for course input
 
     if (onlyNames) {
       const query = `SELECT module_name FROM modules ORDER BY module_name ASC`;
@@ -110,6 +85,84 @@ export async function GET(request) {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
+    }
+
+    if (coursesParam) {
+      let coursesArray;
+      try {
+        coursesArray = JSON.parse(coursesParam);
+
+        if (!Array.isArray(coursesArray)) {
+          coursesArray = [coursesArray];
+        }
+      } catch (error) {
+        coursesArray = coursesParam.includes(",")
+          ? coursesParam.split(",").map((code) => code.trim())
+          : [coursesParam];
+      }
+
+      if (coursesArray.length === 0) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            message: "No valid course codes provided.",
+          }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      const placeholders = coursesArray.map((_, i) => `$${i + 1}`).join(", ");
+
+      const modulesByCourseQuery = `
+        SELECT m.module_name, m.module_code, cm.course_code, cm.id
+        FROM courses_modules cm
+        JOIN modules m ON cm.module_code = m.module_code
+        WHERE cm.course_code IN (${placeholders})
+      `;
+
+      try {
+        const modulesList = await sql(modulesByCourseQuery, coursesArray);
+
+        if (!Array.isArray(modulesList) || modulesList.length === 0) {
+          return new Response(
+            JSON.stringify({
+              success: false,
+              message: "No modules found for the provided courses.",
+            }),
+            {
+              status: 404,
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+        }
+
+        const formattedModulesList = modulesList.map(
+          ({ module_name, module_code, course_code, id }) => ({
+            id,
+            name: `${module_name} (${module_code}) - ${course_code}`,
+          })
+        );
+
+        return new Response(
+          JSON.stringify({ success: true, data: formattedModulesList }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      } catch (queryError) {
+        console.error(" SQL Query Error:", queryError);
+        return new Response(
+          JSON.stringify({ success: false, message: "Database query failed." }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
     }
 
     const query = `
@@ -126,10 +179,8 @@ export async function GET(request) {
       ORDER BY m.module_name;
     `;
 
-    // Fetch modules with related courses
     const modules = await sql(query);
 
-    // Format courses as comma-separated lists
     const formattedModules = modules.map((module) => ({
       ...module,
       courses: module.courses ? module.courses.join(", ") : "",

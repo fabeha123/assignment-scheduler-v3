@@ -6,7 +6,7 @@ export async function fetchCourses() {
     const data = await response.json();
     if (data.success) {
       return data.data.map((course) => ({
-        value: `${course.name} (${course.course_code})`,
+        value: `${course.course_code}`,
         label: `${course.name} (${course.course_code})`,
       }));
     } else {

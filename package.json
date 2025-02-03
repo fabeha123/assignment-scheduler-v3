@@ -2,6 +2,7 @@
   "name": "assignment-scheduler-v3",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -13,6 +14,10 @@
     "@fullcalendar/timegrid": "^6.1.15",
     "@neondatabase/serverless": "^0.10.4",
     "@sendgrid/mail": "^8.1.4",
+    "bcryptjs": "^2.4.3",
+    "jose": "^5.9.6",
+    "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
     "next": "15.1.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
