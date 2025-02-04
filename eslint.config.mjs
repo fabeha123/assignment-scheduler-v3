@@ -1,14 +1,11 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import pkg from "eslint-config-next";
+const { createConfig } = pkg;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
+export default createConfig({
+  // Place any custom rules or overrides here:
+  rules: {
+    "no-console": "warn",
+    // "react/jsx-key": "warn",
+    // etc.
+  },
 });
-
-const eslintConfig = [...compat.extends("next/core-web-vitals")];
-
-export default eslintConfig;
