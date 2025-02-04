@@ -1,12 +1,20 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import useClientSearchParams from "@/app/hooks/useClientSearchParams";
 import SignupForm from "@/app/ui/forms/SignupForm";
 import Link from "next/link";
 
 const SignupScreen = () => {
-  const searchParams = useClientSearchParams(); // Use the custom hook
+  return (
+    <Suspense fallback={<div>Loading search parameters...</div>}>
+      <SignupContent />
+    </Suspense>
+  );
+};
+
+const SignupContent = () => {
+  const searchParams = useClientSearchParams();
   const [token, setToken] = useState(null);
   const [preloadedData, setPreloadedData] = useState({
     fullname: "",
