@@ -52,7 +52,7 @@ export async function POST(request) {
 
     await sql("COMMIT");
 
-    const signupUrl = `${process.env.FRONTEND_URL}/signup?token=${activationToken}`;
+    const signupUrl = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/signup?token=${activationToken}`;
     console.log("Generated Signup URL:", signupUrl);
 
     const emailTemplate = getSignupEmail(full_name, signupUrl);
