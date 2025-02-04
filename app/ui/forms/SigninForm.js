@@ -2,25 +2,18 @@
 
 import React, { useState } from "react";
 import Form from "../components/Form";
+import { useFormState } from "@/app/hooks/useFormState";
 
 const SigninForm = ({ onSuccess }) => {
-  const [formData, setFormData] = useState({
+  const { formData, handleChange } = useFormState({
     email: "",
     password: "",
   });
 
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  const handleChange = (name, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (onSuccess) {
       onSuccess(formData);
     }

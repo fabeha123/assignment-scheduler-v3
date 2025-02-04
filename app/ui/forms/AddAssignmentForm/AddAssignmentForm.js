@@ -27,7 +27,7 @@ const AddAssignmentForm = ({ setAssignments }) => {
   const [modules, setModules] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [aiSuggestion, setAISuggestion] = useState(null); // AI suggestion
+  const [aiSuggestion, setAISuggestion] = useState(null);
 
   // -- Fetch modules for dropdown
   useEffect(() => {

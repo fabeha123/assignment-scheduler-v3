@@ -1,6 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import sgMail from "@sendgrid/mail";
 import crypto from "crypto";
+import { getSignupEmail } from "@/app/utils/emailTemplates/getSignupEmail";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -54,14 +55,13 @@ export async function POST(request) {
     const signupUrl = `${process.env.FRONTEND_URL}/signup?token=${activationToken}`;
     console.log("Generated Signup URL:", signupUrl);
 
+    const emailTemplate = getSignupEmail(full_name, signupUrl);
+
     const msg = {
       to: email,
       from: "k2110157@kingston.ac.uk",
-      subject: "Complete Your Signup",
-      html: `<p>Hi ${full_name},</p>
-             <p>Welcome! Click the link below to complete your signup:</p>
-             <p><a href="${signupUrl}">Complete Signup</a></p>
-             <p>If you didn’t request this, please ignore this email.</p>`,
+      subject: emailTemplate.subject,
+      html: emailTemplate.html,
     };
 
     await sgMail.send(msg);

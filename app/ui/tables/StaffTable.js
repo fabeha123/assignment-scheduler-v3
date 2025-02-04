@@ -6,7 +6,7 @@ const StaffTable = ({ data, openModal }) => {
   const columns = [
     { key: "full_name", label: "Name" },
     { key: "email", label: "Email" },
-    { key: "role", label: "Role" },
+    { key: "role_name", label: "Role" },
     { key: "status", label: "Status" },
   ];
 

@@ -1,16 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Form from "../components/Form";
+import { useFormState } from "@/app/hooks/useFormState";
+import { useSubmitForm } from "@/app/hooks/useSubmitForm";
 
 const SignupForm = ({ preloadedData, token }) => {
-  const [formData, setFormData] = useState({
+  const router = useRouter();
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const { formData, handleChange, setFormData } = useFormState({
     fullname: "",
     email: "",
     password: "",
   });
-
-  const [passwordVisible, setPasswordVisible] = useState(false);
 
   useEffect(() => {
     if (preloadedData) {
@@ -20,29 +24,18 @@ const SignupForm = ({ preloadedData, token }) => {
         email: preloadedData.email || "",
       }));
     }
-  }, [preloadedData]);
+  }, [preloadedData, setFormData]);
 
-  const handleChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const response = await fetch("/api/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password: formData.password }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      alert(data.message || "Failed to complete signup.");
-    } else {
-      alert("Signup successful! You can now log in.");
-    }
-  };
+  const { handleSubmit } = useSubmitForm("/api/signup", () => {
+    alert("Signup successful! Redirecting to login...");
+    router.push("/signin");
+  });
 
   return (
-    <Form onSubmit={handleSubmit} submitLabel="Start Scheduling">
+    <Form
+      onSubmit={(e) => handleSubmit({ token, password: formData.password }, e)}
+      submitLabel="Start Scheduling"
+    >
       <div className="mb-5">
         <Form.InputText
           icon="/icons/fi_15678795.svg"

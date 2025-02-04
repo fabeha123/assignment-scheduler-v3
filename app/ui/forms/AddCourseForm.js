@@ -1,10 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Form from "../components/Form";
+import { useFormState } from "@/app/hooks/useFormState";
+import { useSubmitForm } from "@/app/hooks/useSubmitForm";
 
 const AddCourseForm = ({ onSuccess, onClose }) => {
-  const [formData, setFormData] = useState({
+  const {
+    formData,
+    handleChange,
+    successMessage,
+    setSuccessMessage,
+    errorMessage,
+    setErrorMessage,
+    resetForm,
+  } = useFormState({
     name: "",
     course_code: "",
     start_date: "",
@@ -12,55 +22,11 @@ const AddCourseForm = ({ onSuccess, onClose }) => {
     duration: "",
   });
 
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const handleChange = (name, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSuccessMessage("");
-    setErrorMessage("");
-
-    try {
-      const res = await fetch("/api/course", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setErrorMessage(data.message || "Failed to submit form");
-        return;
-      }
-
-      setSuccessMessage("Course added successfully");
-
-      if (onSuccess) onSuccess(formData);
-
-      setFormData({
-        name: "",
-        start_date: "",
-        end_date: "",
-        duration: "",
-      });
-
-      if (onClose) onClose();
-    } catch (error) {
-      setErrorMessage("An error occurred. Please try again later.");
-    }
-  };
+  const { handleSubmit } = useSubmitForm("/api/course", onSuccess, resetForm);
 
   return (
     <Form
-      onSubmit={handleSubmit}
+      onSubmit={(e) => handleSubmit(formData, e)}
       buttonVariant="actionBlueFilled"
       submitLabel="Add Course"
     >

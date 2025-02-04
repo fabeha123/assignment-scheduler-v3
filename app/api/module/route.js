@@ -76,7 +76,7 @@ export async function GET(request) {
     // Query params -> change them [ ] format to make it short and nice to understand (next supports [])
     const { searchParams } = new URL(request.url);
     const onlyNames = searchParams.get("onlyNames");
-    const coursesParam = searchParams.get("courses"); // New param for course input
+    const coursesParam = searchParams.get("courses");
 
     if (onlyNames) {
       const query = `SELECT module_name FROM modules ORDER BY module_name ASC`;
