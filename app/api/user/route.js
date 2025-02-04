@@ -9,7 +9,7 @@ export async function GET(request) {
   // Debug: Extract and log the auth token from the cookies
   const authToken = cookieHeader
     ?.split("; ")
-    .find((c) => c.startsWith("authToken="))
+    .find((c) => c.startsWith("token="))
     ?.split("=")[1];
 
   console.log("[DEBUG] Extracted authToken:", authToken);
