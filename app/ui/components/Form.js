@@ -142,6 +142,7 @@ const InputMultiSelect = ({
     }
   };
 
+  // Remove a selected option by its value.
   const handleRemove = (removedValue) => {
     onChange(
       selectedItems.filter(

@@ -1,5 +1,5 @@
 import { neon } from "@neondatabase/serverless";
-import bcrypt from "bcryptjs"; // ✅ Use bcryptjs instead
+import bcrypt from "bcryptjs";
 
 export async function POST(request) {
   try {

@@ -32,33 +32,33 @@ export async function POST(request) {
 
     // Construct the AI prompt
     const prompt = `
-You are an AI scheduler for university assignments.
-Here is a list of existing assignments:
-${formattedAssignments}
-
-Now, schedule a new assignment:
-- Module: ${module}
-- Preferred Start Date: ${startDate}
-- Preferred End Date: ${endDate}
-- Objectives: ${objectives.join(", ")}
-- Marking Criteria: ${markingCriteria
-      .map((c) => `${c.criteria} (${c.weightage}%)`)
-      .join(", ")}
-- Brief: ${brief}
-
-Your task:
-1. Suggest an improved start and end date ensuring a **2-week gap** between existing assignments, the dates must be in dd-mm-yyyy format.
-2. Consider the complexity of the assignment when deciding the duration.
-3. Use the below Example Output to respond (no extra text):
-
-\`\`\`json
-{
-  "suggested_start_date": "10/06/2025",
-  "suggested_end_date": "20/06/2025",
-  "reasoning": "The assignment complexity requires at least 10 days."
-}
-\`\`\`
-`;
+      You are an AI scheduler for university assignments.
+      Here is a list of existing assignments:
+      ${formattedAssignments}
+        
+      Now, schedule a new assignment:
+      - Module: ${module}
+      - Preferred Start Date: ${startDate}
+      - Preferred End Date: ${endDate}
+      - Objectives: ${objectives.join(", ")}
+      - Marking Criteria: ${markingCriteria
+        .map((c) => `${c.criteria} (${c.weightage}%)`)
+        .join(", ")}
+      - Brief: ${brief}
+      
+      Your task:
+      1. Suggest an improved start and end date ensuring a **2-week gap** between existing assignments, the dates must be in dd-mm-yyyy format.
+      2. Consider the complexity of the assignment when deciding the duration.
+      3. Use the below Example Output to respond (no extra text):
+      
+      \`\`\`json
+      {
+        "suggested_start_date": "10/06/2025",
+        "suggested_end_date": "20/06/2025",
+        "reasoning": "The assignment complexity requires at least 10 days."
+      }
+      \`\`\`
+      `;
 
     // Call Hugging Face API for Mistral-7B-Instruct
     const response = await fetch(

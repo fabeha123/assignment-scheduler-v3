@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Subheader from "../../ui/components/Subheader";
 import ModuleTable from "../../ui/tables/ModuleTable";
-import ModuleModal from "../../ui/modals/ModuleModal";
+import Modal from "@/app/ui/components/Modal";
 import AddModuleForm from "../../ui/forms/AddModuleForm";
 
 const ModuleScreen = () => {
@@ -23,7 +23,7 @@ const ModuleScreen = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Failed to fetch courses");
+        throw new Error(data.message || "Failed to fetch modules");
       }
 
       setModules(data.data);
@@ -40,31 +40,28 @@ const ModuleScreen = () => {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      {/* Subheader */}
-      <div className="border-b border-[#e8ebf0]">
-        <Subheader
-          title="Modules"
-          actionButtons={[
-            {
-              label: "Add New Module",
-              variant: "outlined",
-              onClick: openModal,
-            },
-          ]}
-        />
+      <Subheader
+        title="Modules"
+        actionButtons={[
+          {
+            label: "Add New Module",
+            variant: "outlined",
+            onClick: openModal,
+          },
+        ]}
+      />
+
+      <div className="flex-1 overflow-auto">
+        {loading ? (
+          <p className="text-center mt-6">Loading modules...</p>
+        ) : error ? (
+          <p className="text-center text-red-600 mt-6">{error}</p>
+        ) : (
+          <ModuleTable data={modules} openModal={openModal} />
+        )}
       </div>
 
-      {/* Module Table */}
-      {loading ? (
-        <p className="text-center mt-6">Loading modules...</p>
-      ) : error ? (
-        <p className="text-center text-red-600 mt-6">{error}</p>
-      ) : (
-        <ModuleTable data={modules} openModal={openModal} />
-      )}
-
-      {/* Modal */}
-      <ModuleModal isOpen={isModalOpen} onClose={closeModal}>
+      <Modal isOpen={isModalOpen} onClose={closeModal} title={"Add Module"}>
         <AddModuleForm
           onSuccess={() => {
             fetchModules();
@@ -72,7 +69,7 @@ const ModuleScreen = () => {
           }}
           onClose={closeModal}
         />
-      </ModuleModal>
+      </Modal>
     </div>
   );
 };

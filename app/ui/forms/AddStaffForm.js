@@ -1,13 +1,26 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Form from "../components/Form";
+import { useFormState } from "@/app/hooks/useFormState";
+import { useSubmitForm } from "@/app/hooks/useSubmitForm";
+import { useFetchData } from "@/app/hooks/useFetchData";
 import { fetchCourses } from "@/app/lib/fetchCourses";
 import { fetchRoles } from "@/app/lib/fetchRoles";
 import { fetchModulesByCourses } from "@/app/lib/fetchModulesByCourses";
 
 const AddStaffForm = ({ onSuccess, onClose }) => {
-  const [formData, setFormData] = useState({
+  const { data: courses } = useFetchData(fetchCourses);
+  const { data: roles } = useFetchData(fetchRoles);
+
+  const {
+    formData,
+    handleChange,
+    successMessage,
+    errorMessage,
+    resetForm,
+    setFormData,
+  } = useFormState({
     full_name: "",
     email: "",
     role: "",
@@ -15,43 +28,17 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
     modules: [],
   });
 
-  const [courses, setCourses] = useState([]);
-  const [roles, setRoles] = useState([]);
   const [modules, setModules] = useState([]);
   const [loadingModules, setLoadingModules] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
-  useEffect(() => {
-    const getCourses = async () => {
-      try {
-        const courseList = await fetchCourses();
-        setCourses(courseList);
-      } catch (error) {
-        console.error("Error fetching courses:", error);
-        setErrorMessage("Failed to fetch courses");
-      }
-    };
+  const { handleSubmit } = useSubmitForm("/api/staff", onSuccess, resetForm);
 
-    const getRoles = async () => {
-      try {
-        const roleList = await fetchRoles();
-        setRoles(roleList);
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-        setErrorMessage("Failed to fetch roles");
-      }
-    };
-
-    getCourses();
-    getRoles();
-  }, []);
-
-  useEffect(() => {
+  // Fetch modules when courses change
+  React.useEffect(() => {
     const getModules = async () => {
       if (!formData.courses || formData.courses.length === 0) {
         setModules([]);
-        setFormData((prev) => ({ ...prev, modules: [] })); // Reset modules in formData
+        setFormData((prev) => ({ ...prev, modules: [] })); // Reset modules
         return;
       }
 
@@ -71,7 +58,7 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
         setModules(fetchedModules);
         setFormData((prev) => ({ ...prev, modules: selectedModules }));
       } catch (error) {
-        setErrorMessage("Failed to fetch modules");
+        console.error("Failed to fetch modules");
       } finally {
         setLoadingModules(false);
       }
@@ -80,77 +67,26 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
     getModules();
   }, [formData.courses]);
 
-  const handleChange = (name, value) => {
-    setFormData((prev) => {
-      let updatedFormData = { ...prev, [name]: value || [] };
-
-      if (name === "courses") {
-        setModules([]);
-        updatedFormData.modules = [];
-      }
-
-      return updatedFormData;
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSuccessMessage("");
-    setErrorMessage("");
-
-    if (!formData.full_name || !formData.email || !formData.role) {
-      setErrorMessage("Please fill in all required fields.");
-      return;
-    }
-
-    const dataToSend = {
-      full_name: formData.full_name,
-      email: formData.email,
-      role: formData.role,
-      courses: formData.courses.map((course) =>
-        typeof course === "object" && course.value ? course.value : course
-      ),
-      modules: formData.modules.map((module) =>
-        typeof module === "object" && module.value ? module.value : module
-      ),
-    };
-
-    try {
-      const res = await fetch("/api/staff", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataToSend),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setErrorMessage(data.message || "Failed to add staff");
-        return;
-      }
-
-      setSuccessMessage("Staff added successfully");
-      if (onSuccess) onSuccess(dataToSend);
-
-      setFormData({
-        full_name: "",
-        email: "",
-        role: "",
-        courses: [],
-        modules: [],
-      });
-
-      if (onClose) onClose();
-    } catch (error) {
-      setErrorMessage("An error occurred. Please try again later.");
-    }
-  };
-
   return (
     <Form
-      onSubmit={handleSubmit}
+      onSubmit={(e) => {
+        handleSubmit(
+          {
+            ...formData,
+            courses: formData.courses.map((c) =>
+              typeof c === "object" && c.value ? c.value : c
+            ),
+            modules: formData.modules.map((m) =>
+              typeof m === "object" && m.value ? m.value : m
+            ),
+          },
+          e
+        );
+      }}
       buttonVariant="actionBlueFilled"
       submitLabel="Add Staff"
     >
+      {/* Row 1: Full Name, Email, Role */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-6">
         <Form.InputTextMain
           label="Full Name"
@@ -177,6 +113,7 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
         />
       </div>
 
+      {/* Row 2: Courses & Modules Selection */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-6">
         <Form.InputMultiSelect
           label="Courses"
@@ -196,6 +133,7 @@ const AddStaffForm = ({ onSuccess, onClose }) => {
         />
       </div>
 
+      {/* Success and Error Messages */}
       {successMessage && (
         <p className="text-green-600 mt-2">{successMessage}</p>
       )}

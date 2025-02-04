@@ -11,10 +11,6 @@ export async function fetchModulesByCourses(courses) {
     const response = await fetch(apiUrl);
     const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch modules");
-    }
-
     if (data.success && Array.isArray(data.data)) {
       return data.data.map((module) => ({
         value: module.id,

@@ -1,100 +1,42 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Form from "../components/Form";
+import { useFormState } from "@/app/hooks/useFormState";
+import { useSubmitForm } from "@/app/hooks/useSubmitForm";
+import { useFetchData } from "@/app/hooks/useFetchData";
 import { fetchCourses } from "@/app/lib/fetchCourses";
 
 const AddModuleForm = ({ onSuccess, onClose }) => {
-  const [formData, setFormData] = useState({
-    module_name: "",
-    module_code: "",
-    is_core: false, // boolean
-    credits: "",
-    courses: [],
-  });
+  const { data: courses } = useFetchData(fetchCourses); // Fetch courses using custom hook
 
-  const [courses, setCourses] = useState([]);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-
-  // fetch course from lib (utility function)
-  useEffect(() => {
-    const getCourses = async () => {
-      const courseList = await fetchCourses();
-      setCourses(courseList);
-    };
-
-    getCourses();
-  }, []);
-
-  const handleChange = (name, value) => {
-    setFormData((prev) => {
-      // Convert credits to a number
-      if (name === "credits") {
-        return { ...prev, credits: Number(value) };
-      }
-
-      // Convert "isCore" to a boolean (true if user chose "yes", else false)
-      if (name === "is_core") {
-        return { ...prev, is_core: value };
-      }
-
-      // Otherwise, just set the value
-      return { ...prev, [name]: value };
+  const { formData, handleChange, successMessage, errorMessage, resetForm } =
+    useFormState({
+      module_name: "",
+      module_code: "",
+      is_core: false, // boolean
+      credits: "",
+      courses: [],
     });
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSuccessMessage("");
-    setErrorMessage("");
-
-    try {
-      // 1) Ensure isCore is strictly boolean before sending
-      const dataToSend = {
-        ...formData,
-        is_core:
-          formData.is_core === "yes"
-            ? true
-            : formData.is_core === "no"
-            ? false
-            : !!formData.is_core,
-      };
-
-      // 2) POST the data
-      const res = await fetch("/api/module", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataToSend),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setErrorMessage(data.message || "Failed to submit form");
-        return;
-      }
-
-      setSuccessMessage("Module added successfully");
-      if (onSuccess) onSuccess(dataToSend);
-
-      // Reset the form fields
-      setFormData({
-        module_name: "",
-        module_code: "",
-        is_core: false,
-        credits: "",
-        courses: [],
-      });
-
-      if (onClose) onClose();
-    } catch (error) {
-      setErrorMessage("An error occurred. Please try again later.");
-    }
-  };
+  const { handleSubmit } = useSubmitForm("/api/module", onSuccess, resetForm);
 
   return (
     <Form
-      onSubmit={handleSubmit}
+      onSubmit={(e) =>
+        handleSubmit(
+          {
+            ...formData,
+            is_core:
+              formData.is_core === "yes"
+                ? true
+                : formData.is_core === "no"
+                ? false
+                : !!formData.is_core,
+          },
+          e
+        )
+      }
       buttonVariant="actionBlueFilled"
       submitLabel="Add Module"
     >
@@ -118,6 +60,7 @@ const AddModuleForm = ({ onSuccess, onClose }) => {
         />
       </div>
 
+      {/* Row 2: Core Module Selection & Credits */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
         <Form.InputSelect
           label="Is the Module Core?"
@@ -132,13 +75,14 @@ const AddModuleForm = ({ onSuccess, onClose }) => {
         <Form.InputTextMain
           label="Credits"
           value={formData.credits}
-          onChange={(e) => handleChange("credits", e.target.value)}
+          onChange={(e) => handleChange("credits", Number(e.target.value))}
           required
           placeholder="Credits"
           type="number"
         />
       </div>
 
+      {/* Row 3: Courses Selection */}
       <Form.InputMultiSelect
         label="Courses"
         value={formData.courses}
@@ -146,6 +90,7 @@ const AddModuleForm = ({ onSuccess, onClose }) => {
         options={courses}
       />
 
+      {/* Success and Error Messages */}
       {successMessage && (
         <p className="text-green-600 mt-2">{successMessage}</p>
       )}

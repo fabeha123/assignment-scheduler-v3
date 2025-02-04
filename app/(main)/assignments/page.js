@@ -36,28 +36,25 @@ const AssignmentScreen = () => {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      {/* Subheader */}
-      <div className="border-b border-[#e8ebf0]">
-        <Subheader
-          title="Assignments"
-          actionButtons={[
-            {
-              label: "Add New Assignment",
-              variant: "blue",
-              onClick: () => router.push("/assignments/add-assignment"),
-            },
-          ]}
-        />
+      <Subheader
+        title="Assignments"
+        actionButtons={[
+          {
+            label: "Add New Assignment",
+            variant: "blue",
+            onClick: () => router.push("/assignments/add-assignment"),
+          },
+        ]}
+      />
+      <div className="flex-1 overflow-auto">
+        {loading ? (
+          <p className="text-center mt-6">Loading assignments...</p>
+        ) : error ? (
+          <p className="text-center text-red-600 mt-6">{error}</p>
+        ) : (
+          <AssignmentTable data={assignments} />
+        )}
       </div>
-
-      {/* Assignments Table */}
-      {loading ? (
-        <p className="text-center mt-6">Loading assignments...</p>
-      ) : error ? (
-        <p className="text-center text-red-600 mt-6">{error}</p>
-      ) : (
-        <AssignmentTable data={assignments} />
-      )}
     </div>
   );
 };
