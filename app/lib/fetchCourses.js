@@ -6,8 +6,8 @@ export async function fetchCourses() {
     const data = await response.json();
     if (data.success) {
       return data.data.map((course) => ({
-        value: course.name,
-        label: course.name,
+        value: `${course.course_code}`,
+        label: `${course.name} (${course.course_code})`,
       }));
     } else {
       throw new Error(data.message || "Failed to fetch courses");

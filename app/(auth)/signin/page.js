@@ -1,12 +1,28 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import SigninForm from "../../ui/forms/SigninForm";
-import Link from "next/link";
 
 const SigninScreen = () => {
-  const handleFormSuccess = (formData) => {
-    console.log("Form data received in parent:", formData);
+  const [error, setError] = useState("");
+
+  const handleFormSuccess = async (formData) => {
+    setError("");
+
+    const response = await fetch("/api/signin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data.message);
+    } else {
+      window.location.href = "/staff";
+    }
   };
 
   return (
@@ -31,18 +47,11 @@ const SigninScreen = () => {
           </div>
         </div>
 
-        {/* The sign-in form */}
-        <SigninForm onSuccess={handleFormSuccess} />
+        {/* Show Error Message if Sign-in Fails */}
+        {error && <p className="text-red-600 text-center">{error}</p>}
 
-        {/* Footer / Link to Sign Up */}
-        <div className="mt-5 text-base font-['Inter'] text-center w-full">
-          <span className="text-[#48515c] font-light">
-            Don’t have an account?{" "}
-          </span>
-          <Link href="/signup" className="text-black font-bold">
-            Sign up
-          </Link>
-        </div>
+        {/* sign-in form */}
+        <SigninForm onSuccess={handleFormSuccess} />
       </div>
     </div>
   );

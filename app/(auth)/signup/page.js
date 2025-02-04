@@ -1,15 +1,60 @@
 "use client";
 
-import React from "react";
-import SignupForm from "../../ui/forms/SignupForm";
+import React, { useState, useEffect, Suspense } from "react";
+import useClientSearchParams from "@/app/hooks/useClientSearchParams";
+import SignupForm from "@/app/ui/forms/SignupForm";
 import Link from "next/link";
 
 const SignupScreen = () => {
-  const handleFormSuccess = (formData) => {
-    console.log("Form data received in parent:", formData);
-  };
-
   return (
+    <Suspense fallback={<div>Loading search parameters...</div>}>
+      <SignupContent />
+    </Suspense>
+  );
+};
+
+const SignupContent = () => {
+  const searchParams = useClientSearchParams();
+  const [token, setToken] = useState(null);
+  const [preloadedData, setPreloadedData] = useState({
+    fullname: "",
+    email: "",
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (searchParams && searchParams.token) {
+      setToken(searchParams.token);
+    } else if (searchParams !== null) {
+      setError("Invalid signup link.");
+      setLoading(false);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (token) {
+      fetch(`/api/staff/${token}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            setPreloadedData({ fullname: data.full_name, email: data.email });
+          } else {
+            setError("Invalid or expired signup link.");
+          }
+        })
+        .catch(() => setError("Failed to verify token."))
+        .finally(() => setLoading(false));
+    }
+  }, [token]);
+
+  if (loading) {
+    return <div className="text-center">Loading...</div>;
+  }
+
+  return error ? (
+    <div className="text-center text-red-600">{error}</div>
+  ) : (
     <div className="flex items-center justify-center min-h-screen bg-white">
       <div className="w-[440px] h-auto p-4">
         <div className="mb-10">
@@ -23,7 +68,7 @@ const SignupScreen = () => {
           </div>
         </div>
 
-        <SignupForm onSuccess={handleFormSuccess} />
+        <SignupForm preloadedData={preloadedData} token={token} />
 
         <div className="mt-5 text-base font-['Inter'] text-center w-full">
           <span className="text-[#48515c] font-light">Already a member? </span>

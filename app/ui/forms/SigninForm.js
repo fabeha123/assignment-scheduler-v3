@@ -5,8 +5,8 @@ import Form from "../components/Form";
 
 const SigninForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
-    username: "",
     email: "",
+    password: "",
   });
 
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -20,15 +20,10 @@ const SigninForm = ({ onSuccess }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
 
     if (onSuccess) {
       onSuccess(formData);
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setPasswordVisible(!passwordVisible);
   };
 
   return (
@@ -37,32 +32,31 @@ const SigninForm = ({ onSuccess }) => {
       submitLabel="Start Scheduling"
       buttonVariant="primary"
     >
-      {/* Add a wrapper div with margin-bottom for spacing */}
       <div className="mb-5">
         <Form.InputText
           icon="/icons/fi_2099100.svg"
-          name="username"
-          value={formData.username}
-          onChange={(e) => handleChange("username", e.target.value)}
+          name="email"
+          value={formData.email}
+          onChange={(e) => handleChange("email", e.target.value)}
           required
-          placeholder="Username"
-          type="text"
+          placeholder="Email"
+          type="email"
         />
       </div>
 
       <div className="relative">
         <Form.InputText
           icon="/icons/fi_103089.svg"
-          name="email"
-          value={formData.email}
-          onChange={(e) => handleChange("email", e.target.value)}
+          name="password"
+          value={formData.password}
+          onChange={(e) => handleChange("password", e.target.value)}
           required
           placeholder="Password"
           type={passwordVisible ? "text" : "password"}
         />
         <div
           className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer"
-          onClick={togglePasswordVisibility}
+          onClick={() => setPasswordVisible(!passwordVisible)}
         >
           <img
             src={

@@ -6,6 +6,7 @@ import Form from "../components/Form";
 const AddCourseForm = ({ onSuccess, onClose }) => {
   const [formData, setFormData] = useState({
     name: "",
+    course_code: "",
     start_date: "",
     end_date: "",
     duration: "",
@@ -64,13 +65,21 @@ const AddCourseForm = ({ onSuccess, onClose }) => {
       submitLabel="Add Course"
     >
       {/* Course Name Full Row */}
-      <div className="mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <Form.InputTextMain
           label="Course Name"
           value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
           required
           placeholder="Enter the course name"
+          type="text"
+        />
+        <Form.InputTextMain
+          label="Course Code"
+          value={formData.course_code}
+          onChange={(e) => handleChange("course_code", e.target.value)}
+          required
+          placeholder="Enter the course code"
           type="text"
         />
       </div>

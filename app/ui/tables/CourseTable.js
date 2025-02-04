@@ -5,6 +5,7 @@ import Table from "../components/Table";
 const CourseTable = ({ data, openModal }) => {
   const columns = [
     { key: "name", label: "Name" },
+    { key: "course_code", label: "Course Code" },
     { key: "start_date", label: "Start Date" },
     { key: "end_date", label: "End Date" },
     { key: "duration", label: "Duration" },
@@ -22,7 +23,14 @@ const CourseTable = ({ data, openModal }) => {
     onClick: openModal,
   };
 
-  return <Table data={formattedData} columns={columns} addButton={addButton} />;
+  return (
+    <Table
+      data={formattedData}
+      columns={columns}
+      addButton={addButton}
+      gridTemplateColumns="1.5fr 1fr 1fr 1fr 1fr"
+    />
+  );
 };
 
 export default CourseTable;

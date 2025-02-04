@@ -106,7 +106,7 @@ Your task:
 
     if (jsonMatch) {
       try {
-        aiSuggestion = JSON.parse(jsonMatch[1]); // Extract only the JSON part
+        aiSuggestion = JSON.parse(jsonMatch[1]);
       } catch (parseError) {
         return new Response(
           JSON.stringify({
@@ -132,7 +132,6 @@ Your task:
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // Minimal error logging in production
     console.error("Error in AI assignment suggestion API:", error);
     return new Response(
       JSON.stringify({ success: false, message: "AI scheduling failed." }),
