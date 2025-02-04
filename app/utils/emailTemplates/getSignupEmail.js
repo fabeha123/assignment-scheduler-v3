@@ -11,7 +11,7 @@ export const getSignupEmail = (full_name, signupUrl) => {
             Complete Signup
           </a>
         </div>
-        <p style="color: #555; font-size: 14px;">If the button above doesn’t work, copy and paste this link into your browser:</p>
+        <p style="color: #555; font-size: 14px;">If the button above doesn’t work, copy and paste this link into your browser: ${signupUrl}</p>
         <p style="font-size: 12px; color: #888;">If you didn’t request this, please ignore this email.</p>
       </div>
     `,
