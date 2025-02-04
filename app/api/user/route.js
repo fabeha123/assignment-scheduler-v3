@@ -2,28 +2,55 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
 export async function GET(request) {
-  const cookieHeader = request.headers.get("cookie");
-  const authToken = cookieHeader
-    ?.split("; ")
-    .find((c) => c.startsWith("authToken="))
-    ?.split("=")[1];
-
-  if (!authToken) {
-    return NextResponse.json(
-      { success: false, message: "No token found" },
-      { status: 401 }
-    );
-  }
-
   try {
-    const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
+    const cookieHeader = request.headers.get("cookie");
+    if (!cookieHeader) {
+      return NextResponse.json(
+        { success: false, message: "No cookie header found" },
+        { status: 401 }
+      );
+    }
+
+    const tokenCookie = cookieHeader
+      .split("; ")
+      .find((c) => c.startsWith("token="));
+
+    if (!tokenCookie) {
+      return NextResponse.json(
+        { success: false, message: "No token cookie found" },
+        { status: 401 }
+      );
+    }
+
+    const token = tokenCookie.split("=")[1];
+    if (!token) {
+      return NextResponse.json(
+        { success: false, message: "Token is empty" },
+        { status: 401 }
+      );
+    }
+
+    if (!process.env.JWT_SECRET) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Server configuration error: missing JWT_SECRET",
+        },
+        { status: 500 }
+      );
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     return NextResponse.json({
       success: true,
-      full_name: decodedToken.full_name,
-      role: decodedToken.role,
+      staffId: decoded.staffId,
+      email: decoded.email,
+      full_name: decoded.full_name,
+      role: decoded.role,
     });
   } catch (error) {
+    console.error("Error in user API:", error);
     return NextResponse.json(
       { success: false, message: "Invalid token" },
       { status: 403 }

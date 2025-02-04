@@ -17,7 +17,8 @@ export async function POST(request) {
     const userResult = await sql`
       SELECT staff_id, full_name, email, password, role_id, status 
       FROM staff 
-      WHERE email = ${email}`;
+      WHERE email = ${email}
+    `;
 
     if (!userResult || userResult.length === 0) {
       return new Response(
@@ -45,7 +46,6 @@ export async function POST(request) {
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
-
     if (!passwordMatch) {
       return new Response(
         JSON.stringify({ message: "Invalid email or password" }),
@@ -53,8 +53,27 @@ export async function POST(request) {
       );
     }
 
+    const roleResult = await sql`
+      SELECT role_name 
+      FROM roles 
+      WHERE role_id = ${user.role_id}
+    `;
+
+    if (!roleResult || roleResult.length === 0) {
+      return new Response(JSON.stringify({ message: "User role not found" }), {
+        status: 500,
+      });
+    }
+
+    const roleName = roleResult[0].role_name;
+
     const token = jwt.sign(
-      { staffId: user.staff_id, email: user.email, role: user.role_id },
+      {
+        staffId: user.staff_id,
+        email: user.email,
+        full_name: user.full_name,
+        role: roleName,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -67,6 +86,7 @@ export async function POST(request) {
       },
     });
   } catch (error) {
+    console.error("Error during sign-in:", error);
     return new Response(JSON.stringify({ message: "Server error" }), {
       status: 500,
     });
