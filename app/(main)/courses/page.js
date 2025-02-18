@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Subheader from "../../ui/components/Subheader";
 import CourseTable from "../../ui/tables/CourseTable";
 import Modal from "@/app/ui/components/Modal";
 import AddCourseForm from "../../ui/forms/AddCourseForm";
+import { Router } from "react-router-dom";
 
 const CoursesScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,6 +16,8 @@ const CoursesScreen = () => {
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
+  const router = useRouter();
 
   // Function to fetch courses from the API
   const fetchCourses = async () => {
@@ -48,6 +52,11 @@ const CoursesScreen = () => {
             label: "Add New Course",
             variant: "outlined",
             onClick: openModal,
+          },
+          {
+            label: "Import",
+            variant: "blue",
+            onClick: () => router.push("/courses/import-courses"),
           },
         ]}
       />
