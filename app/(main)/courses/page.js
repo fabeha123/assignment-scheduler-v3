@@ -6,20 +6,20 @@ import Subheader from "../../ui/components/Subheader";
 import CourseTable from "../../ui/tables/CourseTable";
 import Modal from "@/app/ui/components/Modal";
 import AddCourseForm from "../../ui/forms/AddCourseForm";
-import { Router } from "react-router-dom";
 
 const CoursesScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [loadingId, setLoadingId] = useState(null);
+
+  const router = useRouter();
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const router = useRouter();
-
-  // Function to fetch courses from the API
+  // Fetch Courses from API
   const fetchCourses = async () => {
     try {
       setLoading(true);
@@ -35,6 +35,37 @@ const CoursesScreen = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle Course Deletion
+  const handleDelete = async (course_code) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this course?"
+    );
+    if (!isConfirmed) return;
+
+    setLoadingId(course_code);
+
+    try {
+      const response = await fetch(`/api/course/delete/${course_code}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        alert("✅ Course deleted successfully!");
+        setCourses((prevCourses) =>
+          prevCourses.filter((course) => course.course_code !== course_code)
+        );
+      } else {
+        alert(`❌ Failed to delete course: ${data.message || "Unknown error"}`);
+      }
+    } catch (error) {
+      alert("❌ An error occurred while deleting the course.");
+      console.error("Error deleting course:", error);
+    } finally {
+      setLoadingId(null);
     }
   };
 
@@ -67,7 +98,12 @@ const CoursesScreen = () => {
         ) : error ? (
           <p className="text-center text-red-600 mt-6">{error}</p>
         ) : (
-          <CourseTable data={courses} openModal={openModal} />
+          <CourseTable
+            data={courses}
+            openModal={openModal}
+            onDelete={handleDelete}
+            loadingId={loadingId}
+          />
         )}
       </div>
 

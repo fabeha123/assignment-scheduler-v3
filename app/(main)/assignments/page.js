@@ -10,6 +10,7 @@ const AssignmentScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const [loadingId, setLoadingId] = useState(null);
 
   // Fetch assignments from API
   const fetchAssignments = async () => {
@@ -34,6 +35,41 @@ const AssignmentScreen = () => {
     fetchAssignments();
   }, []);
 
+  // Handle Assignment Deletion
+  const handleDelete = async (assignment_id) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this assignment?"
+    );
+    if (!isConfirmed) return;
+
+    setLoadingId(assignment_id);
+
+    try {
+      const response = await fetch(`/api/assignments/delete/${assignment_id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        alert("✅ Assignment deleted successfully!");
+        setAssignments((prevAssignments) =>
+          prevAssignments.filter(
+            (assignment) => assignment.assignment_id !== assignment_id
+          )
+        );
+      } else {
+        alert(
+          `❌ Failed to delete assignment: ${data.message || "Unknown error"}`
+        );
+      }
+    } catch (error) {
+      alert("❌ An error occurred while deleting the assignment.");
+      console.error("Error deleting assignment:", error);
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-white">
       <Subheader
@@ -52,7 +88,12 @@ const AssignmentScreen = () => {
         ) : error ? (
           <p className="text-center text-red-600 mt-6">{error}</p>
         ) : (
-          <AssignmentTable data={assignments} />
+          <AssignmentTable
+            data={assignments}
+            showActions={true}
+            onDelete={handleDelete}
+            loadingId={loadingId}
+          />
         )}
       </div>
     </div>

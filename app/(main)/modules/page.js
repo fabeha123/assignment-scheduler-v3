@@ -12,6 +12,7 @@ const ModuleScreen = () => {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [loadingId, setLoadingId] = useState(null);
 
   const router = useRouter();
 
@@ -41,6 +42,37 @@ const ModuleScreen = () => {
     fetchModules();
   }, []);
 
+  // Handle Module Deletion
+  const handleDelete = async (module_code) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this module?"
+    );
+    if (!isConfirmed) return;
+
+    setLoadingId(module_code);
+
+    try {
+      const response = await fetch(`/api/module/delete/${module_code}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        alert("✅ Module deleted successfully!");
+        setModules((prevModules) =>
+          prevModules.filter((module) => module.module_code !== module_code)
+        );
+      } else {
+        alert(`❌ Failed to delete module: ${data.message || "Unknown error"}`);
+      }
+    } catch (error) {
+      alert("❌ An error occurred while deleting the module.");
+      console.error("Error deleting module:", error);
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-white">
       <Subheader
@@ -69,6 +101,8 @@ const ModuleScreen = () => {
             data={modules}
             openModal={openModal}
             showActions={true}
+            onDelete={handleDelete}
+            loadingId={loadingId}
           />
         )}
       </div>
