@@ -2,7 +2,7 @@
 
 import Table from "../components/Table";
 
-const ModuleTable = ({ data, openModal }) => {
+const ModuleTable = ({ data, openModal, showActions = true }) => {
   const columns = [
     { key: "module_name", label: "Module Name" },
     { key: "module_code", label: "Module Code" },
@@ -18,11 +18,13 @@ const ModuleTable = ({ data, openModal }) => {
       : row.courses || "—",
   }));
 
-  const addButton = {
-    label: "Add New Module",
-    variant: "textOnly",
-    onClick: openModal,
-  };
+  const addButton = openModal
+    ? {
+        label: "Add New Module",
+        variant: "textOnly",
+        onClick: openModal,
+      }
+    : null;
 
   return (
     <Table
@@ -30,6 +32,7 @@ const ModuleTable = ({ data, openModal }) => {
       columns={columns}
       addButton={addButton}
       gridTemplateColumns="1.25fr 0.75fr 0.5fr 0.5fr 2fr"
+      showActions={showActions}
     />
   );
 };

@@ -5,12 +5,15 @@ import Subheader from "../../ui/components/Subheader";
 import ModuleTable from "../../ui/tables/ModuleTable";
 import Modal from "@/app/ui/components/Modal";
 import AddModuleForm from "../../ui/forms/AddModuleForm";
+import { useRouter } from "next/navigation";
 
 const ModuleScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const router = useRouter();
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -44,9 +47,14 @@ const ModuleScreen = () => {
         title="Modules"
         actionButtons={[
           {
-            label: "Add New Module",
+            label: "Add New Course",
             variant: "outlined",
             onClick: openModal,
+          },
+          {
+            label: "Import",
+            variant: "blue",
+            onClick: () => router.push("/modules/import-modules"),
           },
         ]}
       />
@@ -57,7 +65,11 @@ const ModuleScreen = () => {
         ) : error ? (
           <p className="text-center text-red-600 mt-6">{error}</p>
         ) : (
-          <ModuleTable data={modules} openModal={openModal} />
+          <ModuleTable
+            data={modules}
+            openModal={openModal}
+            showActions={true}
+          />
         )}
       </div>
 

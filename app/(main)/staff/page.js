@@ -5,12 +5,15 @@ import Subheader from "../../ui/components/Subheader";
 import StaffTable from "../../ui/tables/StaffTable";
 import Modal from "@/app/ui/components/Modal";
 import AddStaffForm from "../../ui/forms/AddStaffForm";
+import { useRouter } from "next/navigation";
 
 const StaffScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const router = useRouter();
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -50,7 +53,7 @@ const StaffScreen = () => {
           {
             label: "Import",
             variant: "blue",
-            onClick: () => console.log("Import"),
+            onClick: () => router.push("/staff/import-staff"),
           },
         ]}
       />
