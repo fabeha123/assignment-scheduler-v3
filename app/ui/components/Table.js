@@ -9,6 +9,8 @@ export default function Table({
   addButton = null,
   gridTemplateColumns = "2fr 1fr 1fr 3fr",
   showActions = true,
+  onDelete,
+  loadingId,
 }) {
   return (
     <div className="w-full flex justify-center mt-6">
@@ -60,7 +62,8 @@ export default function Table({
                         </Button>
                         <Button
                           variant="iconOnlyOutlined"
-                          onClick={() => console.log(`Delete row ${rowIndex}`)}
+                          onClick={() => onDelete(row.idKey)}
+                          disabled={loadingId === row.idKey}
                         >
                           <img
                             src="/icons/fi_2976286.svg"

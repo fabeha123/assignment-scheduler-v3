@@ -3,7 +3,7 @@
 import Table from "../components/Table";
 import { useRouter } from "next/navigation";
 
-const AssignmentTable = ({ data }) => {
+const AssignmentTable = ({ data, onDelete, loadingId, showActions = true }) => {
   const router = useRouter();
 
   const columns = [
@@ -17,6 +17,7 @@ const AssignmentTable = ({ data }) => {
   const formattedData = data.map((row) => ({
     ...row,
     name: row.assignment_name,
+    idKey: row.assignment_id,
     start_date: new Date(row.start_date).toLocaleDateString("en-GB"),
     end_date: new Date(row.end_date).toLocaleDateString("en-GB"),
     status: renderStatusTags(row.status),
@@ -34,6 +35,9 @@ const AssignmentTable = ({ data }) => {
       columns={columns}
       addButton={addButton}
       gridTemplateColumns="1.5fr 1fr 1fr 1fr 2fr"
+      showActions={showActions}
+      onDelete={onDelete}
+      loadingId={loadingId}
     />
   );
 };

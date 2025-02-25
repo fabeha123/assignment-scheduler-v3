@@ -2,7 +2,13 @@
 
 import Table from "../components/Table";
 
-const StaffTable = ({ data, openModal }) => {
+const StaffTable = ({
+  data,
+  openModal,
+  onDelete,
+  loadingId,
+  showActions = true,
+}) => {
   const columns = [
     { key: "full_name", label: "Name" },
     { key: "email", label: "Email" },
@@ -12,6 +18,7 @@ const StaffTable = ({ data, openModal }) => {
 
   const formattedData = data.map((row) => ({
     ...row,
+    idKey: row.staff_id,
     courses: Array.isArray(row.courses)
       ? row.courses.join(", ")
       : row.courses || "—",
@@ -29,6 +36,9 @@ const StaffTable = ({ data, openModal }) => {
       columns={columns}
       addButton={addButton}
       gridTemplateColumns="1.0fr 1.0fr 1.0fr 1.0fr"
+      showActions={showActions}
+      onDelete={onDelete}
+      loadingId={loadingId}
     />
   );
 };
