@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Subheader from "../../ui/components/Subheader";
 import StaffTable from "../../ui/tables/StaffTable";
 import Modal from "@/app/ui/components/Modal";
@@ -12,6 +12,7 @@ const StaffScreen = () => {
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [loadingId, setLoadingId] = useState(null);
 
   const router = useRouter();
 
@@ -21,7 +22,7 @@ const StaffScreen = () => {
   const fetchStaff = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/staff", { method: "GET" });
+      const res = await fetch("/api/staff/fetchStaff", { method: "GET" });
       const data = await res.json();
 
       if (!res.ok) {
@@ -40,16 +41,40 @@ const StaffScreen = () => {
     fetchStaff();
   }, []);
 
+  const handleDelete = async (staff_id) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this staff member?"
+    );
+    if (!isConfirmed) return;
+
+    setLoadingId(staff_id);
+
+    try {
+      const response = await fetch(`/api/staff/delete/${staff_id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setStaff((prevStaff) =>
+          prevStaff.filter((staff) => staff.staff_id !== staff_id)
+        );
+      } else {
+        alert("Failed to delete staff. Please try again.");
+      }
+    } catch (error) {
+      alert("An error occurred while deleting staff.");
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-white">
       <Subheader
         title="Staff"
         actionButtons={[
-          {
-            label: "Add New Staff",
-            variant: "outlined",
-            onClick: openModal,
-          },
+          { label: "Add New Staff", variant: "outlined", onClick: openModal },
           {
             label: "Import",
             variant: "blue",
@@ -59,13 +84,17 @@ const StaffScreen = () => {
       />
 
       <div className="flex-1 overflow-auto">
-        {/* Staff Table */}
         {loading ? (
           <p className="text-center mt-6">Loading staff...</p>
         ) : error ? (
           <p className="text-center text-red-600 mt-6">{error}</p>
         ) : (
-          <StaffTable data={staff} openModal={openModal} />
+          <StaffTable
+            data={staff}
+            openModal={openModal}
+            onDelete={handleDelete}
+            loadingId={loadingId}
+          />
         )}
       </div>
 
