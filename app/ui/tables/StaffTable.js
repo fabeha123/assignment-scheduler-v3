@@ -9,20 +9,30 @@ const StaffTable = ({
   loadingId,
   showActions = true,
 }) => {
+  console.log("📌 StaffTable - Received data:", data);
+
+  // Instead of overwriting row.courses with a string,
+  // keep the array for editing, but create a 'coursesDisplay' for the table.
+  const formattedData = data.map((row) => {
+    const originalCourses = Array.isArray(row.courses) ? row.courses : [];
+    return {
+      ...row,
+      idKey: row.staff_id,
+      // We'll add this field ONLY for displaying in the table:
+      coursesDisplay: originalCourses
+        .map((c) => `${c.course_name} (${c.course_code})`)
+        .join(", "),
+    };
+  });
+
+  // We can now display 'coursesDisplay' if we want a Courses column
   const columns = [
     { key: "full_name", label: "Name" },
     { key: "email", label: "Email" },
     { key: "role_name", label: "Role" },
     { key: "status", label: "Status" },
+    { key: "coursesDisplay", label: "Courses" }, // show the comma‐separated string
   ];
-
-  const formattedData = data.map((row) => ({
-    ...row,
-    idKey: row.staff_id,
-    courses: Array.isArray(row.courses)
-      ? row.courses.join(", ")
-      : row.courses || "—",
-  }));
 
   const addButton = {
     label: "Add New User",
@@ -35,10 +45,12 @@ const StaffTable = ({
       data={formattedData}
       columns={columns}
       addButton={addButton}
-      gridTemplateColumns="1.0fr 1.0fr 1.0fr 1.0fr"
+      // Adjust gridTemplateColumns to fit your new column
+      gridTemplateColumns="1fr 1fr 1fr 1fr 1.5fr"
       showActions={showActions}
       onDelete={onDelete}
       loadingId={loadingId}
+      onEdit={openModal}
     />
   );
 };

@@ -10,13 +10,27 @@ import { useRouter } from "next/navigation";
 const StaffScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [staff, setStaff] = useState([]);
+  const [selectedStaff, setSelectedStaff] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingId, setLoadingId] = useState(null);
 
   const router = useRouter();
 
-  const openModal = () => setIsModalOpen(true);
+  const openModal = (staffData = null) => {
+    // If staffData has courses and it’s already an array, great.
+    // If it’s not, we’ll default to []
+    let safeCourses = Array.isArray(staffData?.courses)
+      ? staffData.courses
+      : [];
+
+    setSelectedStaff({
+      ...staffData,
+      courses: safeCourses,
+    });
+    setIsModalOpen(true);
+  };
+
   const closeModal = () => setIsModalOpen(false);
 
   const fetchStaff = async () => {
@@ -29,7 +43,12 @@ const StaffScreen = () => {
         throw new Error(data.message || "Failed to fetch staff");
       }
 
+      console.log("✅ API Response BEFORE setting state:", data.data);
       setStaff(data.data);
+
+      setTimeout(() => {
+        console.log("✅ API Response AFTER setting state:", staff);
+      }, 500);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -98,9 +117,18 @@ const StaffScreen = () => {
         )}
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal} title={"Add Staff"}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={selectedStaff ? "Update Staff" : "Add Staff"}
+      >
         <AddStaffForm
+          staffData={selectedStaff}
           onSuccess={() => {
+            fetchStaff();
+            closeModal();
+          }}
+          onUpdate={() => {
             fetchStaff();
             closeModal();
           }}
