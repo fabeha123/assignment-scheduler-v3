@@ -24,13 +24,11 @@ const CourseTable = ({
     end_date: row.end_date ? row.end_date.split("T")[0] : "—",
   }));
 
-  const addButton = openModal
-    ? {
-        label: "Add New Course",
-        variant: "textOnly",
-        onClick: openModal,
-      }
-    : null;
+  const addButton = {
+    label: "Add New Course",
+    variant: "textOnly",
+    onClick: () => openModal(null),
+  };
 
   return (
     <Table
@@ -41,6 +39,7 @@ const CourseTable = ({
       showActions={showActions}
       onDelete={onDelete}
       loadingId={loadingId}
+      onEdit={openModal}
     />
   );
 };

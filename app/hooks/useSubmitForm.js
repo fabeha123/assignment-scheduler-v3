@@ -10,8 +10,10 @@ export const useSubmitForm = (apiEndpoint, onSuccess, resetForm) => {
     setErrorMessage("");
 
     try {
+      const method = apiEndpoint.includes("/update/") ? "PATCH" : "POST";
+
       const res = await fetch(apiEndpoint, {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });

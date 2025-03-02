@@ -10,25 +10,30 @@ import AddCourseForm from "../../ui/forms/AddCourseForm";
 const CoursesScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingId, setLoadingId] = useState(null);
 
   const router = useRouter();
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const openModal = (courseData = null) => {
+    setSelectedCourse(courseData);
+    setIsModalOpen(true);
+  };
 
-  // Fetch Courses from API
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedCourse(null);
+  };
+
   const fetchCourses = async () => {
     try {
       setLoading(true);
       const res = await fetch("/api/course", { method: "GET" });
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to fetch courses");
-      }
+      if (!res.ok) throw new Error(data.message || "Failed to fetch courses");
 
       setCourses(data.data);
     } catch (err) {
@@ -38,12 +43,8 @@ const CoursesScreen = () => {
     }
   };
 
-  // Handle Course Deletion
   const handleDelete = async (course_code) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this course?"
-    );
-    if (!isConfirmed) return;
+    if (!window.confirm("Are you sure you want to delete this course?")) return;
 
     setLoadingId(course_code);
 
@@ -54,22 +55,19 @@ const CoursesScreen = () => {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        alert("✅ Course deleted successfully!");
         setCourses((prevCourses) =>
           prevCourses.filter((course) => course.course_code !== course_code)
         );
       } else {
-        alert(`❌ Failed to delete course: ${data.message || "Unknown error"}`);
+        alert(`Failed to delete course: ${data.message || "Unknown error"}`);
       }
     } catch (error) {
-      alert("❌ An error occurred while deleting the course.");
-      console.error("Error deleting course:", error);
+      alert("An error occurred while deleting the course.");
     } finally {
       setLoadingId(null);
     }
   };
 
-  // Fetch courses on component mount
   useEffect(() => {
     fetchCourses();
   }, []);
@@ -79,11 +77,7 @@ const CoursesScreen = () => {
       <Subheader
         title="Courses"
         actionButtons={[
-          {
-            label: "Add New Course",
-            variant: "outlined",
-            onClick: openModal,
-          },
+          { label: "Add New Course", variant: "outlined", onClick: openModal },
           {
             label: "Import",
             variant: "blue",
@@ -107,13 +101,15 @@ const CoursesScreen = () => {
         )}
       </div>
 
-      {/* Modal */}
-      <Modal isOpen={isModalOpen} onClose={closeModal} title={"Add Course"}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={selectedCourse ? "Update Course" : "Add Course"}
+      >
         <AddCourseForm
-          onSuccess={() => {
-            fetchCourses();
-            closeModal();
-          }}
+          courseData={selectedCourse}
+          onSuccess={fetchCourses}
+          onUpdate={fetchCourses}
           onClose={closeModal}
         />
       </Modal>
