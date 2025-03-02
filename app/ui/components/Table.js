@@ -91,7 +91,7 @@ export default function Table({
           <div className="p-4">
             <Button
               variant={addButton.variant || "textOnly"}
-              onClick={addButton.onClick || (() => console.log("Add clicked!"))}
+              onClick={addButton.onClick}
             >
               {addButton.label || "Add New Item"}
             </Button>

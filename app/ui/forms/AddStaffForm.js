@@ -3,18 +3,15 @@
 import React, { useState, useEffect } from "react";
 import Form from "../components/Form";
 import { useFormState } from "@/app/hooks/useFormState";
-import { useSubmitForm } from "@/app/hooks/useSubmitForm";
 import { useFetchData } from "@/app/hooks/useFetchData";
 import { fetchCourses } from "@/app/lib/fetchCourses";
 import { fetchRoles } from "@/app/lib/fetchRoles";
 import { fetchModulesByCourses } from "@/app/lib/fetchModulesByCourses";
 
 const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
-  // 1) Fetch dropdown data
   const { data: courses } = useFetchData(fetchCourses);
   const { data: roles } = useFetchData(fetchRoles);
 
-  // 2) Basic form state using your custom hooks
   const {
     formData,
     handleChange,
@@ -30,63 +27,43 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
     modules: [],
   });
 
-  // 3) `modules` = all currently available module options for selected courses
   const [modules, setModules] = useState([]);
   const [loadingModules, setLoadingModules] = useState(false);
 
-  // ─────────────────────────────────────────────────────────────
-  //  First Effect: Initialize form from `staffData` (Preloading)
-  // ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!staffData) {
-      resetForm(); // For "Add Staff" scenario
+      resetForm();
       return;
     }
 
-    console.log("📌 Form Data - StaffData:", staffData);
-
-    // Ensure `staffData.courses` is an array
     const safeCourses = Array.isArray(staffData.courses)
       ? staffData.courses
       : [];
 
-    console.log("📌 Form Data - safeCourses:", safeCourses);
-
-    // Map courses
     const mappedCourses = safeCourses.map((c) => ({
       label: `${c.course_name} (${c.course_code})`,
       value: c.course_code,
     }));
 
-    console.log("📌 Mapped Courses:", mappedCourses);
-
-    // Map modules
     const mappedModules = safeCourses.flatMap((c) =>
       (c.modules || []).map((m) => ({
         label: `${m.module_name} (${m.module_code}) - ${c.course_code}`,
-        value: String(m.course_modules_id), // Ensuring it's a string
+        value: String(m.course_modules_id),
       }))
     );
 
-    console.log("📌 Mapped Modules (Before Setting State):", mappedModules);
+    const roleObject = roles.find((r) => r.label === staffData.role_name);
+    const roleId = roleObject ? roleObject.value : "";
 
-    // ✅ Set form data with delay to confirm update
     setFormData({
       full_name: staffData.full_name || "",
       email: staffData.email || "",
-      role: staffData.role_name || "",
+      role: roleId,
       courses: mappedCourses,
-      modules: mappedModules, // These should persist
+      modules: mappedModules,
     });
+  }, [staffData, roles]);
 
-    setTimeout(() => {
-      console.log("📌 FormData After Setting (Delayed Check):", formData);
-    }, 500); // Delay to ensure state has updated
-  }, [staffData]);
-
-  // ─────────────────────────────────────────────────────────────
-  //  Second Effect: Fetch modules when courses change
-  // ─────────────────────────────────────────────────────────────
   useEffect(() => {
     const getModules = async () => {
       if (!formData.courses || formData.courses.length === 0) {
@@ -100,27 +77,15 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
           formData.courses.map((c) => c.value)
         );
 
-        console.log("📌 Fetched Modules:", fetchedModules);
-        console.log("📌 Preloaded Modules Before Filtering:", formData.modules);
-
-        // If `formData.modules` is already set, don't override
-        if (formData.modules.length > 0) {
-          console.log("✅ Preloaded Modules Exist! Not Overwriting.");
-          setModules(fetchedModules);
-          return;
-        }
-
-        // Match module values correctly
-        const stillValidModules = formData.modules.filter((m) =>
-          fetchedModules.some((f) => String(f.value) === String(m.value))
-        );
-
-        console.log("📌 Still Valid Modules:", stillValidModules);
-
         setModules(fetchedModules);
-        setFormData((prev) => ({ ...prev, modules: stillValidModules }));
+        setFormData((prev) => ({
+          ...prev,
+          modules: prev.modules.filter((m) =>
+            fetchedModules.some((f) => String(f.value) === String(m.value))
+          ),
+        }));
       } catch (error) {
-        console.error("❌ Failed to fetch modules", error);
+        console.error("Error fetching modules", error);
       } finally {
         setLoadingModules(false);
       }
@@ -129,12 +94,11 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
     getModules();
   }, [formData.courses]);
 
-  // 4) On form submit, send the selected `value` IDs to the API
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const payload = {
-      staff_id: staffData?.staff_id, // Use staff_id only when updating
+      staff_id: staffData?.staff_id || null,
       full_name: formData.full_name,
       email: formData.email,
       role: formData.role,
@@ -153,42 +117,25 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
       );
 
       const responseData = await response.json();
-      if (!response.ok)
+
+      if (!response.ok) {
         throw new Error(responseData.message || "Request failed");
+      }
 
-      console.log(
-        `✅ ${staffData ? "Updated" : "Added"} staff successfully`,
-        responseData
-      );
-
-      staffData ? onUpdate() : onSuccess(); // Refresh staff list & close modal
+      staffData ? onUpdate() : onSuccess();
     } catch (error) {
-      console.error("❌ Error:", error);
       alert(
         `Error ${staffData ? "updating" : "adding"} staff: ${error.message}`
       );
     }
   };
 
-  // ─────────────────────────────────────────────────────────────
-  //  Render the form
-  // ─────────────────────────────────────────────────────────────
   return (
     <Form
-      onSubmit={(e) => {
-        handleSubmit(
-          {
-            ...formData,
-            courses: formData.courses.map((c) => c.value),
-            modules: formData.modules.map((m) => m.value),
-          },
-          e
-        );
-      }}
+      onSubmit={handleSubmit}
       buttonVariant="actionBlueFilled"
       submitLabel={staffData ? "Update Staff" : "Add Staff"}
     >
-      {/* Row 1: Full Name, Email, Role */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-6">
         <Form.InputTextMain
           label="Full Name"
@@ -212,7 +159,6 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
         />
       </div>
 
-      {/* Row 2: Courses & Modules */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-6">
         <Form.InputMultiSelect
           label="Courses"

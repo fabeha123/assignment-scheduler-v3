@@ -18,20 +18,14 @@ const StaffScreen = () => {
   const router = useRouter();
 
   const openModal = (staffData = null) => {
-    // If staffData has courses and it’s already an array, great.
-    // If it’s not, we’ll default to []
-    let safeCourses = Array.isArray(staffData?.courses)
-      ? staffData.courses
-      : [];
-
-    setSelectedStaff({
-      ...staffData,
-      courses: safeCourses,
-    });
+    setSelectedStaff(staffData);
     setIsModalOpen(true);
   };
 
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedStaff(null);
+  };
 
   const fetchStaff = async () => {
     try {
@@ -39,16 +33,9 @@ const StaffScreen = () => {
       const res = await fetch("/api/staff/fetchStaff", { method: "GET" });
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to fetch staff");
-      }
+      if (!res.ok) throw new Error(data.message || "Failed to fetch staff");
 
-      console.log("✅ API Response BEFORE setting state:", data.data);
       setStaff(data.data);
-
-      setTimeout(() => {
-        console.log("✅ API Response AFTER setting state:", staff);
-      }, 500);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -61,10 +48,8 @@ const StaffScreen = () => {
   }, []);
 
   const handleDelete = async (staff_id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this staff member?"
-    );
-    if (!isConfirmed) return;
+    if (!window.confirm("Are you sure you want to delete this staff member?"))
+      return;
 
     setLoadingId(staff_id);
 
@@ -93,7 +78,11 @@ const StaffScreen = () => {
       <Subheader
         title="Staff"
         actionButtons={[
-          { label: "Add New Staff", variant: "outlined", onClick: openModal },
+          {
+            label: "Add New Staff",
+            variant: "outlined",
+            onClick: () => openModal(null),
+          },
           {
             label: "Import",
             variant: "blue",
