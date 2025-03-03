@@ -52,7 +52,7 @@ const AddModuleForm = ({ onSuccess, onClose, moduleData, onUpdate }) => {
       credits: moduleData.credits || "",
       courses: mappedCourses,
     });
-  }, [moduleData]);
+  }, [moduleData, resetForm, setFormData]);
 
   const apiEndpoint = moduleData
     ? `/api/module/update/${moduleData.module_code}`

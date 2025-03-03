@@ -62,7 +62,7 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
       courses: mappedCourses,
       modules: mappedModules,
     });
-  }, [staffData, roles]);
+  }, [staffData, roles, resetForm, setFormData]);
 
   useEffect(() => {
     const getModules = async () => {
