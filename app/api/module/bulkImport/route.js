@@ -13,7 +13,7 @@ export async function POST(request) {
     const sql = neon(process.env.DATABASE_URL);
     const errors = [];
 
-    for (const module of requestData) {
+    for (const moduleData of requestData) {
       const { module_name, module_code, credits, courses, is_core } = module;
 
       if (!module_name || !module_code || !credits || !courses) {
