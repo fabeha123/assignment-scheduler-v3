@@ -9,25 +9,29 @@ const StaffTable = ({
   loadingId,
   showActions = true,
 }) => {
+  const formattedData = data.map((row) => {
+    const originalCourses = Array.isArray(row.courses) ? row.courses : [];
+    return {
+      ...row,
+      idKey: row.staff_id,
+      coursesDisplay: originalCourses
+        .map((c) => `${c.course_name} (${c.course_code})`)
+        .join(", "),
+    };
+  });
+
   const columns = [
     { key: "full_name", label: "Name" },
     { key: "email", label: "Email" },
     { key: "role_name", label: "Role" },
     { key: "status", label: "Status" },
+    { key: "coursesDisplay", label: "Courses" },
   ];
-
-  const formattedData = data.map((row) => ({
-    ...row,
-    idKey: row.staff_id,
-    courses: Array.isArray(row.courses)
-      ? row.courses.join(", ")
-      : row.courses || "—",
-  }));
 
   const addButton = {
     label: "Add New User",
     variant: "textOnly",
-    onClick: openModal,
+    onClick: () => openModal(null),
   };
 
   return (
@@ -35,10 +39,11 @@ const StaffTable = ({
       data={formattedData}
       columns={columns}
       addButton={addButton}
-      gridTemplateColumns="1.0fr 1.0fr 1.0fr 1.0fr"
+      gridTemplateColumns="1fr 1fr 1fr 1fr 1.5fr"
       showActions={showActions}
       onDelete={onDelete}
       loadingId={loadingId}
+      onEdit={openModal}
     />
   );
 };

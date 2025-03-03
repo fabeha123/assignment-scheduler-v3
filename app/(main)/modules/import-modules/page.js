@@ -23,7 +23,7 @@ const ImportModulesScreen = () => {
     }
 
     try {
-      const response = await fetch("/api/module", {
+      const response = await fetch("/api/module/bulkImport", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(modules),

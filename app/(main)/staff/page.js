@@ -10,14 +10,22 @@ import { useRouter } from "next/navigation";
 const StaffScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [staff, setStaff] = useState([]);
+  const [selectedStaff, setSelectedStaff] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingId, setLoadingId] = useState(null);
 
   const router = useRouter();
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const openModal = (staffData = null) => {
+    setSelectedStaff(staffData);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedStaff(null);
+  };
 
   const fetchStaff = async () => {
     try {
@@ -25,9 +33,7 @@ const StaffScreen = () => {
       const res = await fetch("/api/staff/fetchStaff", { method: "GET" });
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to fetch staff");
-      }
+      if (!res.ok) throw new Error(data.message || "Failed to fetch staff");
 
       setStaff(data.data);
     } catch (err) {
@@ -42,10 +48,8 @@ const StaffScreen = () => {
   }, []);
 
   const handleDelete = async (staff_id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this staff member?"
-    );
-    if (!isConfirmed) return;
+    if (!window.confirm("Are you sure you want to delete this staff member?"))
+      return;
 
     setLoadingId(staff_id);
 
@@ -74,7 +78,11 @@ const StaffScreen = () => {
       <Subheader
         title="Staff"
         actionButtons={[
-          { label: "Add New Staff", variant: "outlined", onClick: openModal },
+          {
+            label: "Add New Staff",
+            variant: "outlined",
+            onClick: () => openModal(null),
+          },
           {
             label: "Import",
             variant: "blue",
@@ -98,9 +106,18 @@ const StaffScreen = () => {
         )}
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal} title={"Add Staff"}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={selectedStaff ? "Update Staff" : "Add Staff"}
+      >
         <AddStaffForm
+          staffData={selectedStaff}
           onSuccess={() => {
+            fetchStaff();
+            closeModal();
+          }}
+          onUpdate={() => {
             fetchStaff();
             closeModal();
           }}

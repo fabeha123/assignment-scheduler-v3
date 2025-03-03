@@ -13,17 +13,24 @@ const ModuleScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingId, setLoadingId] = useState(null);
+  const [selectedModule, setSelectedModule] = useState(null);
 
   const router = useRouter();
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const openModal = (moduleData = null) => {
+    setSelectedModule(moduleData);
+    setIsModalOpen(true);
+  };
 
-  // Function to fetch modules from the API
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedModule(null);
+  };
+
   const fetchModules = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/module", { method: "GET" });
+      const res = await fetch("/api/module/fetchModules", { method: "GET" });
       const data = await res.json();
 
       if (!res.ok) {
@@ -42,7 +49,6 @@ const ModuleScreen = () => {
     fetchModules();
   }, []);
 
-  // Handle Module Deletion
   const handleDelete = async (module_code) => {
     const isConfirmed = window.confirm(
       "Are you sure you want to delete this module?"
@@ -81,7 +87,7 @@ const ModuleScreen = () => {
           {
             label: "Add New Course",
             variant: "outlined",
-            onClick: openModal,
+            onClick: () => openModal(null),
           },
           {
             label: "Import",
@@ -107,9 +113,18 @@ const ModuleScreen = () => {
         )}
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal} title={"Add Module"}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={selectedModule ? "Update Module" : "Add Module"}
+      >
         <AddModuleForm
+          moduleData={selectedModule}
           onSuccess={() => {
+            fetchModules();
+            closeModal();
+          }}
+          onUpdate={() => {
             fetchModules();
             closeModal();
           }}

@@ -11,6 +11,7 @@ export default function Table({
   showActions = true,
   onDelete,
   loadingId,
+  onEdit,
 }) {
   return (
     <div className="w-full flex justify-center mt-6">
@@ -52,7 +53,7 @@ export default function Table({
                       <div className="flex items-center gap-2">
                         <Button
                           variant="iconOnlyFilled"
-                          onClick={() => console.log(`Edit row ${rowIndex}`)}
+                          onClick={() => onEdit(row)}
                         >
                           <img
                             src="/icons/fi_2985043.svg"
@@ -90,7 +91,7 @@ export default function Table({
           <div className="p-4">
             <Button
               variant={addButton.variant || "textOnly"}
-              onClick={addButton.onClick || (() => console.log("Add clicked!"))}
+              onClick={addButton.onClick}
             >
               {addButton.label || "Add New Item"}
             </Button>

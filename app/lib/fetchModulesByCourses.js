@@ -5,7 +5,9 @@ export async function fetchModulesByCourses(courses) {
     .map((c) => (typeof c === "object" && c.value ? c.value : c))
     .join(",");
 
-  const apiUrl = `/api/module?courses=${encodeURIComponent(courseParam)}`;
+  const apiUrl = `/api/module/fetchByCourses?courses=${encodeURIComponent(
+    courseParam
+  )}`;
 
   try {
     const response = await fetch(apiUrl);
