@@ -26,14 +26,12 @@ const ModuleScreen = () => {
     setIsModalOpen(false);
     setSelectedModule(null);
   };
-  // Function to fetch modules from the API
+
   const fetchModules = async () => {
     try {
       setLoading(true);
       const res = await fetch("/api/module/fetchModules", { method: "GET" });
       const data = await res.json();
-
-      console.log("Fetched Modules from API:", JSON.stringify(data, null, 2)); // Debugging log
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to fetch modules");
@@ -47,12 +45,10 @@ const ModuleScreen = () => {
     }
   };
 
-  // Fetch modules on component mount
   useEffect(() => {
     fetchModules();
   }, []);
 
-  // Handle Module Deletion
   const handleDelete = async (module_code) => {
     const isConfirmed = window.confirm(
       "Are you sure you want to delete this module?"
@@ -60,7 +56,6 @@ const ModuleScreen = () => {
     if (!isConfirmed) return;
 
     setLoadingId(module_code);
-    console.log("Module Code is....", module_code); // Debugging log
 
     try {
       const response = await fetch(`/api/module/delete/${module_code}`, {

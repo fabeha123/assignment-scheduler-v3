@@ -3,9 +3,6 @@ import sgMail from "@sendgrid/mail";
 const hardcodedKey =
   "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";
 
-console.log("Hardcoded API Key is defined:", !!hardcodedKey);
-console.log("Key starts with SG.:", hardcodedKey.startsWith("SG."));
-
 sgMail.setApiKey(hardcodedKey);
 
 async function sendTestEmail() {
@@ -19,7 +16,6 @@ async function sendTestEmail() {
     };
 
     const response = await sgMail.send(msg);
-    console.log("Email sent successfully:", response);
   } catch (error) {
     console.error(
       "Error sending email:",

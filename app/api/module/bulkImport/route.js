@@ -21,7 +21,6 @@ export async function POST(request) {
         continue;
       }
 
-      // Ensure course codes are valid
       let courseCodes = courses
         .split(",")
         .map((code) => code.trim())

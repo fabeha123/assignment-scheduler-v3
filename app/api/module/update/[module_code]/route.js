@@ -6,7 +6,7 @@ export async function PATCH(request) {
   try {
     const { pathname } = new URL(request.url);
     const segments = pathname.split("/");
-    const module_code = segments[segments.length - 1]; // e.g., "PR_003"
+    const module_code = segments[segments.length - 1];
 
     const requestBody = await request.json();
     const { module_name, is_core, credits, courses } = requestBody;
@@ -23,9 +23,7 @@ export async function PATCH(request) {
       );
     }
 
-    const courseCodes = courses.map((course) => course.value); // Extract course_code
-
-    console.log("Extracted Course Codes:", courseCodes);
+    const courseCodes = courses.map((course) => course.value);
 
     await sql("BEGIN");
 

@@ -25,7 +25,7 @@ const ModuleTable = ({
     { key: "module_code", label: "Module Code" },
     { key: "credits", label: "Credits" },
     { key: "is_core", label: "Is Core?" },
-    { key: "coursesDisplay", label: "Courses" }, // ✅ Display formatted courses
+    { key: "coursesDisplay", label: "Courses" },
   ];
 
   const addButton = {

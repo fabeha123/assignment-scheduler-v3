@@ -36,11 +36,6 @@ export async function GET(request) {
 
     `;
 
-    console.log(
-      "🔍 API Response BEFORE Sending:",
-      JSON.stringify(result, null, 2)
-    );
-
     return new Response(
       JSON.stringify({ success: true, data: result }, null, 2),
       {
