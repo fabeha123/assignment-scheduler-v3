@@ -18,11 +18,6 @@ const Sidebar = () => {
             fullName: data.full_name || "User",
             role: data.role || "User",
           });
-
-          console.log("User Set in Sidebar State:", {
-            fullName: data.full_name,
-            role: data.role,
-          });
         } else {
           console.warn("User API did not return success");
         }

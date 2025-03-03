@@ -13,18 +13,27 @@ const ModuleScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingId, setLoadingId] = useState(null);
+  const [selectedModule, setSelectedModule] = useState(null);
 
   const router = useRouter();
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const openModal = (moduleData = null) => {
+    setSelectedModule(moduleData);
+    setIsModalOpen(true);
+  };
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedModule(null);
+  };
   // Function to fetch modules from the API
   const fetchModules = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/module", { method: "GET" });
+      const res = await fetch("/api/module/fetchModules", { method: "GET" });
       const data = await res.json();
+
+      console.log("Fetched Modules from API:", JSON.stringify(data, null, 2)); // Debugging log
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to fetch modules");
@@ -38,6 +47,7 @@ const ModuleScreen = () => {
     }
   };
 
+  // Fetch modules on component mount
   useEffect(() => {
     fetchModules();
   }, []);
@@ -50,6 +60,7 @@ const ModuleScreen = () => {
     if (!isConfirmed) return;
 
     setLoadingId(module_code);
+    console.log("Module Code is....", module_code); // Debugging log
 
     try {
       const response = await fetch(`/api/module/delete/${module_code}`, {
@@ -81,7 +92,7 @@ const ModuleScreen = () => {
           {
             label: "Add New Course",
             variant: "outlined",
-            onClick: openModal,
+            onClick: () => openModal(null),
           },
           {
             label: "Import",
@@ -107,9 +118,18 @@ const ModuleScreen = () => {
         )}
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal} title={"Add Module"}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={selectedModule ? "Update Module" : "Add Module"}
+      >
         <AddModuleForm
+          moduleData={selectedModule}
           onSuccess={() => {
+            fetchModules();
+            closeModal();
+          }}
+          onUpdate={() => {
             fetchModules();
             closeModal();
           }}

@@ -1,25 +1,70 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Form from "../components/Form";
 import { useFormState } from "@/app/hooks/useFormState";
-import { useSubmitForm } from "@/app/hooks/useSubmitForm";
 import { useFetchData } from "@/app/hooks/useFetchData";
 import { fetchCourses } from "@/app/lib/fetchCourses";
+import { useSubmitForm } from "@/app/hooks/useSubmitForm";
 
-const AddModuleForm = ({ onSuccess, onClose }) => {
-  const { data: courses } = useFetchData(fetchCourses); // Fetch courses using custom hook
+const AddModuleForm = ({ onSuccess, onClose, moduleData, onUpdate }) => {
+  const { data: courses } = useFetchData(fetchCourses);
+  const router = useRouter();
 
-  const { formData, handleChange, successMessage, errorMessage, resetForm } =
-    useFormState({
-      module_name: "",
-      module_code: "",
-      is_core: false, // boolean
-      credits: "",
-      courses: [],
+  const {
+    formData,
+    handleChange,
+    setFormData,
+    successMessage,
+    errorMessage,
+    resetForm,
+  } = useFormState({
+    module_name: "",
+    module_code: "",
+    is_core: false,
+    credits: "",
+    courses: [],
+  });
+
+  useEffect(() => {
+    if (!moduleData) {
+      resetForm();
+      return;
+    }
+
+    const safeCourses = Array.isArray(moduleData.courses)
+      ? moduleData.courses
+      : [];
+
+    const mappedCourses = safeCourses.map((c) => ({
+      label: `${c.course_name} (${c.course_code})`,
+      value: c.course_code,
+    }));
+
+    const boolIsCore =
+      moduleData.is_core === "Yes" || moduleData.is_core === true;
+
+    setFormData({
+      module_name: moduleData.module_name || "",
+      module_code: moduleData.module_code || "",
+      is_core: boolIsCore,
+      credits: moduleData.credits || "",
+      courses: mappedCourses,
     });
+  }, [moduleData]);
 
-  const { handleSubmit } = useSubmitForm("/api/module", onSuccess, resetForm);
+  const apiEndpoint = moduleData
+    ? `/api/module/update/${moduleData.module_code}`
+    : "/api/module/addModule";
+
+  const handleSuccess = () => {
+    if (onSuccess) onSuccess();
+    if (onClose) onClose();
+    router.push("/modules");
+  };
+
+  const { handleSubmit } = useSubmitForm(apiEndpoint, handleSuccess, resetForm);
 
   return (
     <Form
@@ -38,9 +83,8 @@ const AddModuleForm = ({ onSuccess, onClose }) => {
         )
       }
       buttonVariant="actionBlueFilled"
-      submitLabel="Add Module"
+      submitLabel={moduleData ? "Update Module" : "Add Module"}
     >
-      {/* Row 1: Module Name + Module Code */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
         <Form.InputTextMain
           label="Module Name"
@@ -53,19 +97,23 @@ const AddModuleForm = ({ onSuccess, onClose }) => {
         <Form.InputTextMain
           label="Module Code"
           value={formData.module_code}
-          onChange={(e) => handleChange("module_code", e.target.value)}
+          onChange={
+            moduleData
+              ? () => {}
+              : (e) => handleChange("module_code", e.target.value)
+          }
           required
-          placeholder="Enter the module code"
+          placeholder="Enter module code"
           type="text"
+          readOnly={!!moduleData}
         />
       </div>
 
-      {/* Row 2: Core Module Selection & Credits */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
         <Form.InputSelect
           label="Is the Module Core?"
-          value={formData.is_core ? "yes" : "no"}
-          onChange={(val) => handleChange("is_core", val)}
+          value={formData.is_core === true ? "yes" : "no"}
+          onChange={(val) => handleChange("is_core", val === "yes")}
           required
           options={[
             { value: "yes", label: "Yes" },
@@ -82,7 +130,6 @@ const AddModuleForm = ({ onSuccess, onClose }) => {
         />
       </div>
 
-      {/* Row 3: Courses Selection */}
       <Form.InputMultiSelect
         label="Courses"
         value={formData.courses}
@@ -90,7 +137,6 @@ const AddModuleForm = ({ onSuccess, onClose }) => {
         options={courses}
       />
 
-      {/* Success and Error Messages */}
       {successMessage && (
         <p className="text-green-600 mt-2">{successMessage}</p>
       )}

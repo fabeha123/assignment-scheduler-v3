@@ -9,29 +9,30 @@ const ModuleTable = ({
   loadingId,
   showActions = true,
 }) => {
+  const formattedData = data.map((row) => {
+    const originalCourses = Array.isArray(row.courses) ? row.courses : [];
+    return {
+      ...row,
+      idKey: row.module_code,
+      coursesDisplay: originalCourses
+        .map((c) => `${c.course_name} (${c.course_code})`)
+        .join(", "),
+    };
+  });
+
   const columns = [
     { key: "module_name", label: "Module Name" },
     { key: "module_code", label: "Module Code" },
     { key: "credits", label: "Credits" },
     { key: "is_core", label: "Is Core?" },
-    { key: "courses", label: "Courses" },
+    { key: "coursesDisplay", label: "Courses" }, // ✅ Display formatted courses
   ];
 
-  const formattedData = data.map((row) => ({
-    ...row,
-    idKey: row.module_code,
-    courses: Array.isArray(row.courses)
-      ? row.courses.join(", ")
-      : row.courses || "—",
-  }));
-
-  const addButton = openModal
-    ? {
-        label: "Add New Module",
-        variant: "textOnly",
-        onClick: openModal,
-      }
-    : null;
+  const addButton = {
+    label: "Add New Module",
+    variant: "textOnly",
+    onClick: () => openModal(null),
+  };
 
   return (
     <Table
@@ -42,6 +43,7 @@ const ModuleTable = ({
       showActions={showActions}
       onDelete={onDelete}
       loadingId={loadingId}
+      onEdit={openModal}
     />
   );
 };

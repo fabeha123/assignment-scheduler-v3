@@ -1,6 +1,6 @@
 export async function fetchModules() {
   try {
-    const response = await fetch("/api/module?onlyNames=true");
+    const response = await fetch("/api/module/fetchModules?onlyNames=true");
     const data = await response.json();
     if (data.success) {
       return data.data.map((module) => ({
