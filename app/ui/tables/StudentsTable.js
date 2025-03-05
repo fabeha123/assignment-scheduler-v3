@@ -1,28 +1,51 @@
+"use client";
+
 import Table from "../components/Table";
 
-const StudentsTable = () => {
+const StudentsTable = ({
+  data,
+  openModal,
+  onDelete,
+  loadingId,
+  showActions = true,
+}) => {
+  const formattedData = data.map((row) => {
+    const originalCourses = Array.isArray(row.courses) ? row.courses : [];
+    return {
+      ...row,
+      idKey: row.student_id,
+      coursesDisplay: originalCourses
+        .map((c) => `${c.course_name} (${c.course_code})`)
+        .join(", "),
+    };
+  });
+
   const columns = [
-    { key: "name", label: "Name" },
-    { key: "course", label: "Course" },
-    { key: "year", label: "Year" },
-    { key: "modules", label: "Modules" },
+    { key: "full_name", label: "Name" },
+    { key: "email", label: "Email" },
+    { key: "student_id", label: "Kingston Id" },
+    { key: "status", label: "Status" },
+    { key: "coursesDisplay", label: "Courses" },
   ];
 
-  const initialData = [
-    {
-      name: "Fabeha Saleem",
-      course: "BSc Computer Science",
-      year: "Final Year",
-      modules: "Advance Data Modelling, Software Development Practice",
-    },
-  ];
+  const addButton = {
+    label: "Add New User",
+    variant: "textOnly",
+    onClick: () => openModal(null),
+  };
 
   return (
     <Table
-      data={initialData}
+      data={formattedData}
       columns={columns}
-      addButtonLabel="Add New Student"
+      addButton={addButton}
+      gridTemplateColumns="1fr 1fr 1fr 1fr 1.5fr"
+      showActions={showActions}
+      onDelete={onDelete}
+      loadingId={loadingId}
+      onEdit={openModal}
     />
   );
 };
+
 export default StudentsTable;

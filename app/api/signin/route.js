@@ -14,17 +14,36 @@ export async function POST(request) {
       );
     }
 
-    const userResult = await sql`
-      SELECT staff_id, full_name, email, password, role_id, status 
+    let userType = "staff";
+    let userIdColumn = "staff_id";
+    let tableName = "staff";
+    let role = null;
+
+    let userQuery = `
+      SELECT staff_id AS user_id, full_name, email, password, role_id, status 
       FROM staff 
-      WHERE email = ${email}
+      WHERE email = $1
     `;
+    let userResult = await sql(userQuery, [email]);
 
     if (!userResult || userResult.length === 0) {
-      return new Response(
-        JSON.stringify({ message: "Invalid email or password" }),
-        { status: 401 }
-      );
+      userType = "student";
+      userIdColumn = "student_id";
+      tableName = "students";
+
+      userQuery = `
+        SELECT student_id AS user_id, full_name, email, password, status 
+        FROM students 
+        WHERE email = $1
+      `;
+      userResult = await sql(userQuery, [email]);
+
+      if (!userResult || userResult.length === 0) {
+        return new Response(
+          JSON.stringify({ message: "Invalid email or password" }),
+          { status: 401 }
+        );
+      }
     }
 
     const user = userResult[0];
@@ -53,26 +72,34 @@ export async function POST(request) {
       );
     }
 
-    const roleResult = await sql`
-      SELECT role_name 
-      FROM roles 
-      WHERE role_id = ${user.role_id}
-    `;
+    if (userType === "staff") {
+      const roleResult = await sql`
+        SELECT role_name 
+        FROM roles 
+        WHERE role_id = ${user.role_id}
+      `;
 
-    if (!roleResult || roleResult.length === 0) {
-      return new Response(JSON.stringify({ message: "User role not found" }), {
-        status: 500,
-      });
+      if (!roleResult || roleResult.length === 0) {
+        return new Response(
+          JSON.stringify({ message: "User role not found" }),
+          {
+            status: 500,
+          }
+        );
+      }
+      role = roleResult[0].role_name;
+    } else {
+      role = "student";
     }
 
-    const roleName = roleResult[0].role_name;
-
+    // Generate JWT Token
     const token = jwt.sign(
       {
-        staffId: user.staff_id,
+        userId: user.user_id,
         email: user.email,
         full_name: user.full_name,
-        role: roleName,
+        role: role,
+        userType: userType,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }

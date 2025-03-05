@@ -8,9 +8,9 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 export async function POST(request) {
   try {
     const sql = neon(process.env.DATABASE_URL);
-    const { full_name, email, role, modules } = await request.json();
+    const { student_id, full_name, email, modules } = await request.json();
 
-    if (!full_name || !email || !role) {
+    if (!student_id || !full_name || !email) {
       return new Response(
         JSON.stringify({ message: "Missing required fields" }),
         { status: 400 }
@@ -19,33 +19,32 @@ export async function POST(request) {
 
     const activationToken = crypto.randomBytes(32).toString("hex");
 
-    const staffInsertQuery = `
-      INSERT INTO staff (full_name, email, role_id, password, activation_token, status)
+    const studentInsertQuery = `
+      INSERT INTO students (student_id, full_name, email, password, activation_token, status)
       VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING staff_id;
+      RETURNING student_id;
     `;
     const defaultPassword = null;
 
-    const staffResult = await sql(staffInsertQuery, [
+    const studentResult = await sql(studentInsertQuery, [
+      student_id,
       full_name,
       email,
-      role,
       defaultPassword,
       activationToken,
       "Pending",
     ]);
 
-    if (!staffResult || staffResult.length === 0) {
-      throw new Error("Failed to insert staff record");
+    if (!studentResult || studentResult.length === 0) {
+      throw new Error("Failed to insert student record");
     }
-    const staffId = staffResult[0].staff_id;
 
     if (modules && Array.isArray(modules) && modules.length > 0) {
       const placeholders = modules.map((_, i) => `($1, $${i + 2})`).join(", ");
-      const params = [staffId, ...modules];
+      const params = [student_id, ...modules];
 
       await sql(
-        `INSERT INTO staff_coursesmodules (staff_id, courses_modules_id) VALUES ${placeholders}`,
+        `INSERT INTO students_coursesmodules (student_id, courses_modules_id) VALUES ${placeholders}`,
         params
       );
     }
@@ -65,15 +64,27 @@ export async function POST(request) {
       html: emailTemplate.html,
     };
 
-    await sgMail.send(msg);
+    console.log(
+      "SENDGRID_API_KEY:",
+      process.env.SENDGRID_API_KEY ? "Exists" : "MISSING"
+    );
+
+    try {
+      await sgMail.send(msg);
+      console.log("Email sent successfully");
+    } catch (emailError) {
+      console.error("SendGrid Error:", emailError.response?.body || emailError);
+    }
 
     return new Response(
-      JSON.stringify({ message: "Staff added and email sent", staffId }),
+      JSON.stringify({ message: "Student added and email sent", student_id }),
       { status: 200 }
     );
   } catch (error) {
-    return new Response(JSON.stringify({ message: "Server error" }), {
-      status: 500,
-    });
+    console.error("Error in addStudent API:", error);
+    return new Response(
+      JSON.stringify({ message: "Server error", error: error.message }),
+      { status: 500 }
+    );
   }
 }

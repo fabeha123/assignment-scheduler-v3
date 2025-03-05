@@ -34,13 +34,25 @@ const SignupContent = () => {
 
   useEffect(() => {
     if (token) {
+      console.log(token);
       fetch(`/api/staff/${token}`)
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
             setPreloadedData({ fullname: data.full_name, email: data.email });
           } else {
-            setError("Invalid or expired signup link.");
+            return fetch(`/api/student/${token}`)
+              .then((response) => response.json())
+              .then((studentData) => {
+                if (studentData.success) {
+                  setPreloadedData({
+                    fullname: studentData.full_name,
+                    email: studentData.email,
+                  });
+                } else {
+                  setError("Invalid or expired signup link.");
+                }
+              });
           }
         })
         .catch(() => setError("Failed to verify token."))

@@ -15,7 +15,7 @@ const useClientSearchParams = () => {
       }
       setParams(paramsObj);
     }
-  }, [searchParams]); // Ensure this runs when searchParams change
+  }, [searchParams]);
 
   return params;
 };

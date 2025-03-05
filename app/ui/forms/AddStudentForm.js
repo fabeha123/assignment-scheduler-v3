@@ -5,12 +5,10 @@ import Form from "../components/Form";
 import { useFormState } from "@/app/hooks/useFormState";
 import { useFetchData } from "@/app/hooks/useFetchData";
 import { fetchCourses } from "@/app/lib/fetchCourses";
-import { fetchRoles } from "@/app/lib/fetchRoles";
 import { fetchModulesByCourses } from "@/app/lib/fetchModulesByCourses";
 
-const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
+const AddStudentForm = ({ onSuccess, onClose, studentData, onUpdate }) => {
   const { data: courses } = useFetchData(fetchCourses);
-  const { data: roles } = useFetchData(fetchRoles);
 
   const {
     formData,
@@ -20,10 +18,10 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
     resetForm,
     setFormData,
   } = useFormState({
+    student_id: "",
     full_name: "",
     email: "",
-    role: "",
-    courses: [],
+    courses: "",
     modules: [],
   });
 
@@ -31,13 +29,13 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
   const [loadingModules, setLoadingModules] = useState(false);
 
   useEffect(() => {
-    if (!staffData) {
+    if (!studentData) {
       resetForm();
       return;
     }
 
-    const safeCourses = Array.isArray(staffData.courses)
-      ? staffData.courses
+    const safeCourses = Array.isArray(studentData.courses)
+      ? studentData.courses
       : [];
 
     const mappedCourses = safeCourses.map((c) => ({
@@ -52,32 +50,27 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
       }))
     );
 
-    const roleObject = roles.find((r) => r.label === staffData.role_name);
-    const roleId = roleObject ? roleObject.value : "";
-
     setFormData({
-      full_name: staffData.full_name || "",
-      email: staffData.email || "",
-      role: roleId,
-      courses: mappedCourses,
+      student_id: studentData.student_id,
+      full_name: studentData.full_name || "",
+      email: studentData.email || "",
+      courses: studentData.courses?.[0]?.course_code || "",
       modules: mappedModules,
     });
-  }, [staffData, roles]);
+  }, [studentData]);
 
   useEffect(() => {
     const getModules = async () => {
-      if (!formData.courses || formData.courses.length === 0) {
+      if (!formData.courses) {
         setModules([]);
         return;
       }
 
       setLoadingModules(true);
       try {
-        const fetchedModules = await fetchModulesByCourses(
-          formData.courses.map((c) => c.value)
-        );
-
+        const fetchedModules = await fetchModulesByCourses([formData.courses]);
         setModules(fetchedModules);
+
         setFormData((prev) => ({
           ...prev,
           modules: prev.modules.filter((m) =>
@@ -98,19 +91,20 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
     e.preventDefault();
 
     const payload = {
-      staff_id: staffData?.staff_id || null,
+      student_id: formData.student_id,
       full_name: formData.full_name,
       email: formData.email,
-      role: formData.role,
-      courses: formData.courses.map((c) => c.value),
+      courses: formData.courses,
       modules: formData.modules.map((m) => m.value),
     };
 
     try {
       const response = await fetch(
-        staffData ? `/api/staff/update/${staffData.staff_id}` : "/api/staff",
+        studentData
+          ? `/api/student/update/${studentData.student_id}`
+          : "/api/student/addStudent",
         {
-          method: staffData ? "PATCH" : "POST",
+          method: studentData ? "PATCH" : "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         }
@@ -122,10 +116,10 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
         throw new Error(responseData.message || "Request failed");
       }
 
-      staffData ? onUpdate() : onSuccess();
+      studentData ? onUpdate() : onSuccess();
     } catch (error) {
       alert(
-        `Error ${staffData ? "updating" : "adding"} staff: ${error.message}`
+        `Error ${studentData ? "updating" : "adding"} student: ${error.message}`
       );
     }
   };
@@ -134,9 +128,22 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
     <Form
       onSubmit={handleSubmit}
       buttonVariant="actionBlueFilled"
-      submitLabel={staffData ? "Update Staff" : "Add Staff"}
+      submitLabel={studentData ? "Update Student" : "Add Student"}
     >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-6">
+        <Form.InputTextMain
+          label="Kingston ID"
+          value={formData.student_id}
+          onChange={
+            studentData
+              ? () => {}
+              : (e) => handleChange("student_id", e.target.value)
+          }
+          required
+          placeholder="Enter student ID"
+          type="text"
+          readOnly={!!studentData}
+        />
         <Form.InputTextMain
           label="Full Name"
           value={formData.full_name}
@@ -145,22 +152,15 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
         />
         <Form.InputTextMain
           label="Email"
+          type="email"
           value={formData.email}
           onChange={(e) => handleChange("email", e.target.value)}
           required
-          type="email"
-        />
-        <Form.InputSelect
-          label="Role"
-          value={formData.role}
-          onChange={(val) => handleChange("role", val)}
-          required
-          options={roles}
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-6">
-        <Form.InputMultiSelect
+        <Form.InputSelect
           label="Courses"
           value={formData.courses}
           onChange={(value) => handleChange("courses", value)}
@@ -184,4 +184,4 @@ const AddStaffForm = ({ onSuccess, onClose, staffData, onUpdate }) => {
   );
 };
 
-export default AddStaffForm;
+export default AddStudentForm;

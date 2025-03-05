@@ -24,7 +24,6 @@ export async function PATCH(request, { params }) {
 
     await sql("BEGIN");
 
-    // Check if staff details need to be updated
     const existingStaff = await sql(
       `SELECT full_name, email, role_id FROM staff WHERE staff_id = $1`,
       [staff_id]
