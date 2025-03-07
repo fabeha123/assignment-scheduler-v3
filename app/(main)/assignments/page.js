@@ -64,7 +64,6 @@ const AssignmentScreen = () => {
       }
     } catch (error) {
       alert("❌ An error occurred while deleting the assignment.");
-      console.error("Error deleting assignment:", error);
     } finally {
       setLoadingId(null);
     }

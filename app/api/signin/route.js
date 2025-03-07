@@ -82,9 +82,7 @@ export async function POST(request) {
       if (!roleResult || roleResult.length === 0) {
         return new Response(
           JSON.stringify({ message: "User role not found" }),
-          {
-            status: 500,
-          }
+          { status: 500 }
         );
       }
       role = roleResult[0].role_name;
@@ -92,14 +90,27 @@ export async function POST(request) {
       role = "student";
     }
 
-    // Generate JWT Token
+    const allUsersQuery = `
+      SELECT all_users
+      FROM permissions 
+      WHERE role_id = $1 
+      AND tab_name = 'all_users'
+    `;
+
+    const allUsersResult = await sql(allUsersQuery, [user.role_id]);
+
+    const hasAllUsersPermission =
+      allUsersResult.length > 0 && Boolean(allUsersResult[0].all_users);
+
     const token = jwt.sign(
       {
         userId: user.user_id,
         email: user.email,
         full_name: user.full_name,
         role: role,
+        role_id: user.role_id,
         userType: userType,
+        hasAllUsersPermission,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }

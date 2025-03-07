@@ -48,6 +48,7 @@ export async function GET(request) {
       email: decoded.email,
       full_name: decoded.full_name,
       role: decoded.role,
+      role_id: decoded.role_id,
     });
   } catch (error) {
     console.error("Error in user API:", error);

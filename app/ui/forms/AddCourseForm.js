@@ -37,7 +37,7 @@ const AddCourseForm = ({ onSuccess, onClose, courseData }) => {
       end_date: courseData.end_date || "",
       duration: courseData.duration || "",
     });
-  }, [courseData, setFormData, resetForm]);
+  }, [courseData]);
 
   useEffect(() => {
     if (formData.start_date && formData.end_date) {
