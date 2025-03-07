@@ -7,12 +7,17 @@ import { UserProvider } from "@/app/context/UserContext";
 export default function MainLayout({ children }) {
   return (
     <UserProvider>
-      {" "}
-      <div className="">
+      <div className="flex flex-col h-screen">
+        {/* Header */}
         <Header />
-        <div className="flex flex-grow">
+
+        {/* Main Content (Sidebar + Page Content) */}
+        <div className="flex flex-grow overflow-hidden">
+          {/* Sidebar */}
           <Sidebar />
-          <div className="flex-grow overflow-auto">{children}</div>
+
+          {/* Page Content - Ensuring full height and proper scrolling */}
+          <div className="flex-grow h-full overflow-auto">{children}</div>
         </div>
       </div>
     </UserProvider>
