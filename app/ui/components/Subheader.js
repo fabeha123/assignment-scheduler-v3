@@ -12,7 +12,7 @@ const Subheader = ({ title, actionButtons = [], showBackButton = false }) => {
     currentTabAccess === "read_only" ? [] : actionButtons;
 
   return (
-    <div className="w-full h-16 bg-white border-b border-[#e8ebf0] flex items-center justify-between px-6 sticky top-0 z-50 shadow-sm">
+    <div className="w-full h-20 bg-white border-b border-[#e8ebf0] flex items-center justify-between px-6 sticky top-0 z-50 shadow-sm">
       {/* Left Section: Back Button + Title */}
       <div className="flex items-center gap-4">
         {showBackButton && (
