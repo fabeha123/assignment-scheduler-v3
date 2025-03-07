@@ -34,7 +34,7 @@ const SignupContent = () => {
 
   useEffect(() => {
     if (token) {
-      console.log(token);
+      // console.log(token);
       fetch(`/api/staff/${token}`)
         .then((response) => response.json())
         .then((data) => {

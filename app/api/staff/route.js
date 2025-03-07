@@ -52,7 +52,7 @@ export async function POST(request) {
 
     await sql("COMMIT");
 
-    console.log(process.env.SENDGRID_API_KEY);
+    // console.log(process.env.SENDGRID_API_KEY);
 
     const signupUrl = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/signup?token=${activationToken}`;
 

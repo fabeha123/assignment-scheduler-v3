@@ -51,7 +51,7 @@ export async function POST(request) {
 
     await sql("COMMIT");
 
-    console.log(process.env.SENDGRID_API_KEY);
+    // console.log(process.env.SENDGRID_API_KEY);
 
     const signupUrl = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/signup?token=${activationToken}`;
 
@@ -63,11 +63,6 @@ export async function POST(request) {
       subject: emailTemplate.subject,
       html: emailTemplate.html,
     };
-
-    console.log(
-      "SENDGRID_API_KEY:",
-      process.env.SENDGRID_API_KEY ? "Exists" : "MISSING"
-    );
 
     try {
       await sgMail.send(msg);

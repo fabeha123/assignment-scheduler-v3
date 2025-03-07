@@ -2,7 +2,7 @@
 
 export async function fetchCourses() {
   try {
-    const response = await fetch("/api/course?onlyNames=true");
+    const response = await fetch("/api/course/fetch?onlyNames=true");
     const data = await response.json();
     if (data.success) {
       return data.data.map((course) => ({

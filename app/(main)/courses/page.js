@@ -30,7 +30,7 @@ const CoursesScreen = () => {
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/course", { method: "GET" });
+      const res = await fetch("/api/course/fetch", { method: "GET" });
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || "Failed to fetch courses");

@@ -2,6 +2,7 @@
 
 import Button from "./Button";
 import React from "react";
+import { useUser } from "@/app/context/UserContext";
 
 export default function Table({
   data = [],
@@ -13,10 +14,16 @@ export default function Table({
   loadingId,
   onEdit,
 }) {
+  const { user, currentTabAccess } = useUser();
+
+  const isActionsVisible =
+    currentTabAccess === "read_only" ? false : showActions;
+
+  const isAddButtonVisible = currentTabAccess !== "read_only";
+
   return (
     <div className="w-full flex justify-center mt-6">
       <div className="w-[95%] max-w-[1440px] bg-white border border-[#e8ebf0] rounded-md overflow-hidden">
-        {/* Table Header */}
         <div
           className="grid bg-white border-b border-[#e8ebf0] px-4 py-2 text-sm font-light text-black"
           style={{ gridTemplateColumns }}
@@ -26,7 +33,6 @@ export default function Table({
               {col.label}
             </div>
           ))}
-          {showActions}
         </div>
 
         {/* Table Rows */}
@@ -35,7 +41,7 @@ export default function Table({
             key={rowIndex}
             className="grid border-b border-[#e8ebf0] px-4 py-3 text-sm text-black"
             style={{
-              gridTemplateColumns: showActions
+              gridTemplateColumns: isActionsVisible
                 ? `${gridTemplateColumns} auto`
                 : gridTemplateColumns,
             }}
@@ -49,7 +55,7 @@ export default function Table({
                   >
                     <span className="pr-2">{row[col.key] ?? "—"}</span>
 
-                    {showActions && (
+                    {isActionsVisible && (
                       <div className="flex items-center gap-2">
                         <Button
                           variant="iconOnlyFilled"
@@ -87,7 +93,7 @@ export default function Table({
           </div>
         ))}
 
-        {addButton && (
+        {isAddButtonVisible && (
           <div className="p-4">
             <Button
               variant={addButton.variant || "textOnly"}
