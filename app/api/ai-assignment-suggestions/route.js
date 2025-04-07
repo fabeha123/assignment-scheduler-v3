@@ -1,141 +1,105 @@
-import { neon } from "@neondatabase/serverless";
+import { NextResponse } from "next/server";
 
 export async function POST(request) {
   try {
-    const { module, startDate, endDate, objectives, markingCriteria, brief } =
-      await request.json();
+    const {
+      formattedAssignments,
+      startDate,
+      endDate,
+      objectives,
+      markingCriteria,
+      brief,
+    } = await request.json();
 
-    const sql = neon(process.env.DATABASE_URL);
-
-    const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
-
-    const assignmentResponse = await fetch(
-      `${baseURL}/api/assignments?onlyScheduleCheck=true&module=${module}`
-    );
-    const assignmentData = await assignmentResponse.json();
-    const existingAssignments = assignmentData.data;
-
-    if (!assignmentData.success || existingAssignments.length === 0) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: "No existing assignments found for AI to analyze.",
-        }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Convert assignments into a readable format
-    const formattedAssignments = existingAssignments
-      .map((a) => `${a.assignment_name}: ${a.start_date} to ${a.end_date}`)
-      .join("\n");
-
-    // Construct the AI prompt
     const prompt = `
-      You are an AI scheduler for university assignments.
-      Here is a list of existing assignments:
-      ${formattedAssignments}
+      You are an AI scheduler helping university staff assign fair and realistic coursework timelines for university students.
         
-      Now, schedule a new assignment:
-      - Module: ${module}
+      The students belong to a mixed-ability cohort (including 1st Class, 2:1, and 2:2 performers). Suggest a schedule that is fair, non-overlapping, and allows an average student to succeed.
+        
+      Here is a list of existing assignments:
+      ${formattedAssignments || "None"}
+        
+      Assignment Details:
       - Preferred Start Date: ${startDate}
       - Preferred End Date: ${endDate}
       - Objectives: ${objectives.join(", ")}
       - Marking Criteria: ${markingCriteria
-        .map((c) => `${c.criteria} (${c.weightage}%)`)
+        .map((c) => `${c.criteria} (${c.weightage})`)
         .join(", ")}
       - Brief: ${brief}
       
       Your task:
-      1. Suggest an improved start and end date ensuring a **2-week gap** between existing assignments, the dates must be in dd-mm-yyyy format.
-      2. Consider the complexity of the assignment when deciding the duration.
-      3. Use the below Example Output to respond (no extra text):
+      1. Suggest realistic start and end dates avoiding overlap with existing deadlines.
+      2. Ensure a **7–14 day gap** between assignments, adjusting for task complexity.
+      3. Only return **valid JSON** using this format:
       
-      \`\`\`json
       {
-        "suggested_start_date": "10/06/2025",
-        "suggested_end_date": "20/06/2025",
-        "reasoning": "The assignment complexity requires at least 10 days."
+        "suggested_start_date": "dd-mm-yyyy",
+        "suggested_end_date": "dd-mm-yyyy",
+        "reasoning": "Your logic here."
       }
-      \`\`\`
       `;
 
-    // Call Hugging Face API for Mistral-7B-Instruct
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3",
+    const aiResponse = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
+          "HTTP-Referer": "http://localhost:3000",
+          "X-Title": "Assignment Scheduler",
         },
         body: JSON.stringify({
-          inputs: prompt,
-          parameters: {
-            max_new_tokens: 400,
-            temperature: 0.7,
-            top_p: 0.9,
-            repetition_penalty: 1.2,
-            return_full_text: false,
-          },
+          model: "deepseek-ai/DeepSeek-V3-0324",
+          messages: [
+            {
+              role: "system",
+              content: "You are an expert academic AI scheduler.",
+            },
+            { role: "user", content: prompt },
+          ],
+          temperature: 0.3,
+          max_tokens: 800,
         }),
       }
     );
 
-    const result = await response.json();
+    const result = await aiResponse.json();
+    const text = result?.choices?.[0]?.message?.content;
 
-    // Check if the response contains valid text
-    const aiResponse = result?.[0]?.generated_text;
-    if (!aiResponse) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: "AI response was empty or invalid.",
-        }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+    if (!text) {
+      return NextResponse.json(
+        { success: false, message: "No AI output." },
+        { status: 500 }
       );
     }
 
-    // Extract JSON block using regex
-    const jsonMatch = aiResponse.match(/```json\n([\s\S]+?)\n```/);
-    let aiSuggestion = {
-      suggested_start_date: "",
-      suggested_end_date: "",
-      reasoning: "",
-    };
-
-    if (jsonMatch) {
-      try {
-        aiSuggestion = JSON.parse(jsonMatch[1]);
-      } catch (parseError) {
-        return new Response(
-          JSON.stringify({
-            success: false,
-            message: "AI response parsing failed.",
-          }),
-          { status: 500, headers: { "Content-Type": "application/json" } }
-        );
-      }
-    } else {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: "AI response did not contain valid JSON.",
-        }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+    const match =
+      text.match(/```json\n([\s\S]+?)\n```/) || text.match(/({[\s\S]+})/);
+    if (!match) {
+      return NextResponse.json(
+        { success: false, message: "AI response did not contain JSON." },
+        { status: 500 }
       );
     }
 
-    // Return the final suggestion
-    return new Response(JSON.stringify({ success: true, data: aiSuggestion }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    let parsed;
+    try {
+      parsed = JSON.parse(match[1]);
+    } catch (err) {
+      return NextResponse.json(
+        { success: false, message: "Failed to parse AI response JSON." },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, data: parsed }, { status: 200 });
   } catch (error) {
     console.error("Error in AI assignment suggestion API:", error);
-    return new Response(
-      JSON.stringify({ success: false, message: "AI scheduling failed." }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+    return NextResponse.json(
+      { success: false, message: "AI scheduling failed." },
+      { status: 500 }
     );
   }
 }

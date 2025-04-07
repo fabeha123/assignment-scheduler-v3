@@ -77,7 +77,7 @@ const AssignmentScreen = () => {
           {
             label: "Add New Assignment",
             variant: "blue",
-            onClick: () => router.push("/assignments/add-assignment"),
+            onClick: () => router.push("/assignments/upload-assignment"),
           },
         ]}
       />
