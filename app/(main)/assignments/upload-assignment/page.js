@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Subheader from "@/app/ui/components/Subheader";
 import Button from "@/app/ui/components/Button";
-import AssignmentReviewScreen from "../review-assignment/page";
+import AssignmentReviewScreen from "@/app/ui/screens/AssignmentReviewScreen";
 import SetAssignmentDatesScreen from "../set-assignment-dates/page";
 import mammoth from "mammoth";
 
