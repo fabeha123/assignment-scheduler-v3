@@ -81,7 +81,7 @@ const UploadAssignmentScreen = () => {
       <Subheader title="Assignment Brief" showBackButton />
       <div className="flex-1 overflow-auto p-6 flex flex-col gap-6 items-center">
         <div className="w-full md:w-2/3 bg-[#f9fafb] border border-[#e5e7eb] p-4 rounded-lg text-sm text-gray-700">
-          📄 Paste the full assignment brief or upload a Word file. We'll
+          📄 Paste the full assignment brief or upload a Word file. We&apos;ll
           extract the title, task summary, learning outcomes, and marking
           criteria.
         </div>

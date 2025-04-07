@@ -44,7 +44,7 @@ ${brief}
         headers: {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "http://localhost:3000", // change if deployed
+          "HTTP-Referer": "https://assignment-scheduler-v3.vercel.app/", // TODO: change if deployed
           "X-Title": "Assignment Extractor",
         },
         body: JSON.stringify({

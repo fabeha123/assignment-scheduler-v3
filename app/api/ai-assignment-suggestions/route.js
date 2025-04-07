@@ -47,7 +47,7 @@ export async function POST(request) {
         headers: {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "http://localhost:3000",
+          "HTTP-Referer": "https://assignment-scheduler-v3.vercel.app/",
           "X-Title": "Assignment Scheduler",
         },
         body: JSON.stringify({
