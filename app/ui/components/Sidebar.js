@@ -72,7 +72,12 @@ const Sidebar = () => {
   if (!user) return null;
 
   const navLinks = [
-    { name: "Home", icon: "/icons/fi_3388614.svg", path: "/", tab: "Home" },
+    {
+      name: "Dashboard",
+      icon: "/icons/fi_3388614.svg",
+      path: "/dashboard",
+      tab: "Dashboard",
+    },
     {
       name: "Students",
       icon: "/icons/fi_17005556.svg",
