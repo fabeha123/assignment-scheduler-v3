@@ -20,8 +20,24 @@ const SigninScreen = () => {
 
     if (!response.ok) {
       setError(data.message);
-    } else {
-      window.location.href = "/staff";
+      return;
+    }
+
+    try {
+      const userRes = await fetch("/api/user", { credentials: "include" });
+      const userInfo = await userRes.json();
+
+      if (userInfo?.success) {
+        const isStudent = userInfo?.role === "student";
+        window.location.href = isStudent
+          ? "/students/student-dashboard"
+          : "/staff";
+      } else {
+        setError("Could not determine user role.");
+      }
+    } catch (err) {
+      console.error("Failed to load user info", err);
+      setError("Something went wrong. Please try again.");
     }
   };
 
@@ -47,10 +63,8 @@ const SigninScreen = () => {
           </div>
         </div>
 
-        {/* Show Error Message if Sign-in Fails */}
         {error && <p className="text-red-600 text-center">{error}</p>}
 
-        {/* sign-in form */}
         <SigninForm onSuccess={handleFormSuccess} />
       </div>
     </div>

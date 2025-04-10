@@ -8,47 +8,68 @@ import Link from "next/link";
 const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState({
-    fullName: null,
-    role: null,
-    roleId: null,
-  });
+  const [user, setUser] = useState(null);
   const [permissions, setPermissions] = useState([]);
-  const { setCurrentTabAccess } = useUser();
+  const [studentModules, setStudentModules] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { setCurrentTabAccess } = useUser();
 
   useEffect(() => {
     const fetchUserAndPermissions = async () => {
       try {
         const userRes = await fetch("/api/user", { credentials: "include" });
-        if (!userRes.ok) throw new Error("User API request failed");
         const userData = await userRes.json();
 
         if (userData.success && userData.role_id) {
           setUser({
-            fullName: userData.full_name || "User",
-            role: userData.role || "User",
+            fullName: userData.full_name,
+            role: userData.role,
             roleId: userData.role_id,
           });
 
-          const permissionsRes = await fetch(
-            `/api/permissions/fetchByRole?role_id=${userData.role_id}`
-          );
-          if (!permissionsRes.ok)
-            throw new Error("Permissions API request failed");
-          const permissionsData = await permissionsRes.json();
-
-          if (permissionsData.success) {
-            setPermissions(permissionsData.data);
+          if (userData.role === "student") {
+            const modRes = await fetch("/api/student/modules");
+            const modData = await modRes.json();
+            if (modData.success) setStudentModules(modData.data);
+          } else {
+            const permissionsRes = await fetch(
+              `/api/permissions/fetchByRole?role_id=${userData.role_id}`
+            );
+            const permissionsData = await permissionsRes.json();
+            if (permissionsData.success) {
+              setPermissions(permissionsData.data);
+            }
           }
         }
-      } catch (error) {
-        console.error("Error fetching user or permissions:", error);
+      } catch (err) {
+        console.error("Sidebar load error:", err);
       }
     };
 
     fetchUserAndPermissions();
   }, []);
+
+  const handleTabClick = (tabName) => {
+    const tabPermission = permissions.find((p) => p.tab_name === tabName);
+    const access = tabPermission?.can_write
+      ? "can_edit"
+      : tabPermission?.can_read
+      ? "read_only"
+      : "no_access";
+
+    setCurrentTabAccess(access);
+  };
+
+  const handleModuleClick = (moduleCode) => {
+    router.push(`/students/student-dashboard?module=${moduleCode}`);
+  };
+
+  const handleLogout = async () => {
+    const res = await fetch("/api/logout");
+    if (res.ok) router.push("/signin");
+  };
+
+  if (!user) return null;
 
   const navLinks = [
     { name: "Home", icon: "/icons/fi_3388614.svg", path: "/", tab: "Home" },
@@ -90,71 +111,36 @@ const Sidebar = () => {
     },
   ];
 
-  const allowedLinks = navLinks.filter((link) => {
-    return permissions.some(
+  const allowedLinks = navLinks.filter((link) =>
+    permissions.some(
       (perm) => perm.tab_name === link.tab && (perm.can_read || perm.can_write)
-    );
-  });
-
-  const handleTabClick = (tabName) => {
-    const tabPermission = permissions.find((perm) => perm.tab_name === tabName);
-
-    let newAccess = "no_access";
-    if (tabPermission) {
-      newAccess = tabPermission.can_write
-        ? "can_edit"
-        : tabPermission.can_read
-        ? "read_only"
-        : "no_access";
-    }
-
-    setCurrentTabAccess(newAccess);
-  };
-
-  const handleLogout = async () => {
-    try {
-      const response = await fetch("/api/logout", { method: "GET" });
-      if (response.ok) {
-        router.push("/signin");
-      } else {
-        console.error("Logout failed");
-      }
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
+    )
+  );
 
   return (
-    <aside className="w-72 bg-[#FFFFFF] border-r border-gray-300 h-screen flex flex-col">
-      {/* User Info Section */}
+    <aside className="w-72 bg-white border-r border-gray-300 h-screen flex flex-col">
+      {/* Top user info */}
       <div className="p-4 border-b border-gray-300 h-20 flex items-center justify-between relative">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-red-400 rounded-full text-white flex items-center justify-center font-bold">
             {user.fullName
-              ? user.fullName
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()
-              : "U"}
+              ?.split(" ")
+              .map((n) => n[0])
+              .join("") || "U"}
           </div>
           <div className="w-52">
             <div className="text-lg font-semibold text-gray-800 truncate">
-              {user.fullName ?? "Loading..."}
+              {user.fullName}
             </div>
-            <div className="text-sm text-gray-500 truncate">
-              {user.role ?? "Loading..."}
-            </div>
+            <div className="text-sm text-gray-500 truncate">{user.role}</div>
           </div>
         </div>
-
         <button
           onClick={() => setDropdownOpen(!dropdownOpen)}
           className="text-gray-600 hover:text-black transition pr-2 mr-10"
         >
           ⋮
         </button>
-
         {dropdownOpen && (
           <div className="absolute top-16 right-4 bg-white shadow-md rounded-md w-32 py-2 border">
             <button
@@ -167,33 +153,44 @@ const Sidebar = () => {
         )}
       </div>
 
-      {/* Navigation Links (Scrollable) */}
+      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-4">
         <ul className="space-y-4">
-          {allowedLinks.map((link, index) => (
-            <li key={index}>
-              <Link
-                href={link.path}
-                onClick={() => handleTabClick(link.tab)}
-                className={`flex items-center gap-3 px-4 py-2 rounded-md transition ${
-                  pathname === link.path
-                    ? "bg-[#d2edff] text-[#408fc3] font-medium"
-                    : "text-gray-600 hover:bg-blue-100 hover:text-blue-600"
-                }`}
-              >
-                <img
-                  src={
-                    pathname === link.path
-                      ? link.icon.replace(".svg", "_active.svg")
-                      : link.icon
-                  }
-                  alt={`${link.name} Icon`}
-                  className="w-6 h-6"
-                />
-                <span>{link.name}</span>
-              </Link>
-            </li>
-          ))}
+          {user.role === "student"
+            ? studentModules.map((mod) => (
+                <li key={mod.module_code}>
+                  <div
+                    className="flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 border hover:bg-gray-100 cursor-pointer"
+                    onClick={() => handleModuleClick(mod.module_code)}
+                  >
+                    📘 <span>{mod.module_name}</span>
+                  </div>
+                </li>
+              ))
+            : allowedLinks.map((link, index) => (
+                <li key={index}>
+                  <Link
+                    href={link.path}
+                    onClick={() => handleTabClick(link.tab)}
+                    className={`flex items-center gap-3 px-4 py-2 rounded-md transition ${
+                      pathname === link.path
+                        ? "bg-[#d2edff] text-[#408fc3] font-medium"
+                        : "text-gray-600 hover:bg-blue-100 hover:text-blue-600"
+                    }`}
+                  >
+                    <img
+                      src={
+                        pathname === link.path
+                          ? link.icon.replace(".svg", "_active.svg")
+                          : link.icon
+                      }
+                      alt={`${link.name} Icon`}
+                      className="w-6 h-6"
+                    />
+                    <span>{link.name}</span>
+                  </Link>
+                </li>
+              ))}
         </ul>
       </nav>
     </aside>
