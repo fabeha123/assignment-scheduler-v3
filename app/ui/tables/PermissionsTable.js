@@ -1,5 +1,6 @@
 "use client";
 
+import Dashboard from "@/app/(main)/dashboard/page";
 import Table from "../components/Table";
 
 const permissionsOptions = ["No Access", "Read", "Read & Write"];
@@ -14,6 +15,7 @@ const PermissionsTable = ({
 }) => {
   const columns = [
     { key: "role_name", label: "Role Name" },
+    { key: "Dashboard", label: "Dashboard" },
     { key: "Students", label: "Students" },
     { key: "Staff", label: "Staff" },
     { key: "Courses", label: "Courses" },
@@ -75,6 +77,20 @@ const PermissionsTable = ({
   const formattedData = data.map((row) => ({
     ...row,
     idKey: row.role_id,
+    Dashboard: (
+      <select
+        value={row.Dashboard || "No Access"}
+        onChange={(e) =>
+          handlePermissionChange(row.role_id, "Dashboard", e.target.value)
+        }
+      >
+        {permissionsOptions.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    ),
     Students: (
       <select
         value={row.Students || "No Access"}
@@ -165,7 +181,7 @@ const PermissionsTable = ({
       data={formattedData}
       columns={columns}
       addButton={addButton}
-      gridTemplateColumns="1.5fr 1fr 1fr 1fr 1fr 1fr 1fr"
+      gridTemplateColumns="1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr"
       showActions={showActions}
       onDelete={onDelete}
       loadingId={loadingId}
