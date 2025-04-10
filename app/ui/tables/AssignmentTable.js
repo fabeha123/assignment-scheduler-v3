@@ -8,10 +8,9 @@ const AssignmentTable = ({ data, onDelete, loadingId, showActions = true }) => {
 
   const columns = [
     { key: "name", label: "Assignment Name" },
-    { key: "weightage", label: "Weightage (%)" },
     { key: "start_date", label: "Start Date" },
     { key: "end_date", label: "End Date" },
-    { key: "status", label: "Status" },
+    { key: "module_code", label: "Module Code" },
   ];
 
   const formattedData = data.map((row) => ({
@@ -26,7 +25,7 @@ const AssignmentTable = ({ data, onDelete, loadingId, showActions = true }) => {
   const addButton = {
     label: "Add New Assignment",
     variant: "textOnly",
-    onClick: () => router.push("/assignments/add-assignment"),
+    onClick: () => router.push("/assignments/upload-assignment"),
   };
 
   return (
@@ -34,7 +33,7 @@ const AssignmentTable = ({ data, onDelete, loadingId, showActions = true }) => {
       data={formattedData}
       columns={columns}
       addButton={addButton}
-      gridTemplateColumns="1.5fr 1fr 1fr 1fr 2fr"
+      gridTemplateColumns="3fr 1fr 1fr 2fr"
       showActions={showActions}
       onDelete={onDelete}
       loadingId={loadingId}

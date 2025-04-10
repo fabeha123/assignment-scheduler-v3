@@ -261,7 +261,7 @@ export async function GET(request) {
     } else {
       // Default query: Fetch all assignments
       assignments = await sql(`
-        SELECT a.assignment_id, a.name AS assignment_name, a.weightage, a.start_date, a.end_date, m.module_name
+        SELECT a.assignment_id, a.name AS assignment_name, a.start_date, a.end_date, m.module_code
         FROM assignments a
         LEFT JOIN modules m ON a.module_code = m.module_code
         ORDER BY a.start_date ASC

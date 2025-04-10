@@ -17,7 +17,10 @@ export const UserProvider = ({ children }) => {
         const userData = await userRes.json();
 
         if (userData.success && userData.role_id) {
-          setUser(userData);
+          setUser({
+            ...userData,
+            userType: userData.userType,
+          });
 
           const permissionsRes = await fetch(
             `/api/permissions/fetchByRole?role_id=${userData.role_id}`

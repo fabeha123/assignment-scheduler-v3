@@ -44,11 +44,12 @@ export async function GET(request) {
 
     return NextResponse.json({
       success: true,
-      staffId: decoded.staffId,
+      staffId: decoded.userId,
       email: decoded.email,
       full_name: decoded.full_name,
       role: decoded.role,
       role_id: decoded.role_id,
+      userType: decoded.userType,
     });
   } catch (error) {
     console.error("Error in user API:", error);

@@ -116,13 +116,16 @@ export async function POST(request) {
       { expiresIn: "1h" }
     );
 
-    return new Response(JSON.stringify({ message: "Sign-in successful" }), {
-      status: 200,
-      headers: {
-        "Set-Cookie": `token=${token}; HttpOnly; Path=/; Secure; SameSite=Strict`,
-        "Content-Type": "application/json",
-      },
-    });
+    return new Response(
+      JSON.stringify({ message: "Sign-in successful", userType: userType }),
+      {
+        status: 200,
+        headers: {
+          "Set-Cookie": `token=${token}; HttpOnly; Path=/; Secure; SameSite=Strict`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error during sign-in:", error);
     return new Response(JSON.stringify({ message: "Server error" }), {
