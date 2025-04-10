@@ -86,8 +86,8 @@ const StudentDashboard = () => {
     if (data.success) {
       setAssignmentsByModule((prev) => {
         const updated = { ...prev };
-        for (let module in updated) {
-          updated[module] = updated[module].map((a) =>
+        for (let mod in updated) {
+          updated[mod] = updated[mod].map((a) =>
             a.assignment_id === assignment.assignment_id
               ? { ...a, guidance: data.guidance }
               : a
@@ -109,9 +109,9 @@ const StudentDashboard = () => {
     <div className="flex flex-col bg-white min-h-screen">
       <Subheader title="My Assignments" />
       <div className="mt-6 px-6 pb-12">
-        {Object.entries(assignmentsByModule).map(([module, assignments]) => (
-          <div key={module} className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">{module}</h2>
+        {Object.entries(assignmentsByModule).map(([mod, assignments]) => (
+          <div key={mod} className="mb-10">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">{mod}</h2>
 
             <div className="grid gap-6">
               {assignments.map((assignment) => {
