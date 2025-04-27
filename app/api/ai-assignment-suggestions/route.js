@@ -51,7 +51,7 @@ export async function POST(request) {
           "X-Title": "Assignment Scheduler",
         },
         body: JSON.stringify({
-          model: "deepseek-ai/DeepSeek-V3-0324",
+          model: "deepseek/deepseek-chat-v3-0324:free",
           messages: [
             {
               role: "system",

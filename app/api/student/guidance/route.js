@@ -73,7 +73,7 @@ Do not add any text outside the JSON. Only return clean JSON.`;
         Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "deepseek-ai/DeepSeek-V3-0324",
+        model: "deepseek/deepseek-chat-v3-0324:free",
         messages: [
           {
             role: "system",

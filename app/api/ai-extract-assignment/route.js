@@ -48,7 +48,7 @@ ${brief}
           "X-Title": "Assignment Extractor",
         },
         body: JSON.stringify({
-          model: "deepseek-ai/DeepSeek-V3-0324",
+          model: "deepseek/deepseek-chat-v3-0324:free",
           messages: [
             {
               role: "system",
@@ -67,6 +67,7 @@ ${brief}
     );
 
     const result = await response.json();
+    console.log("AI result:", result); // ADD THIS
     const text = result?.choices?.[0]?.message?.content;
 
     if (!text) {
@@ -89,6 +90,10 @@ ${brief}
     let parsed;
     try {
       parsed = JSON.parse(match[1]);
+      if (parsed.learning_outcome && !parsed.learning_outcomes) {
+        parsed.learning_outcomes = parsed.learning_outcome;
+        delete parsed.learning_outcome;
+      }
     } catch (e) {
       console.error("Parsing failed:", e);
       return NextResponse.json(
