@@ -27,6 +27,7 @@ const StudentsTableAllColumns = ({ data, showActions = true }) => {
       columns={columns}
       gridTemplateColumns="1fr 1fr 1fr 1fr 1fr"
       showActions={showActions}
+      //addButton={null}
     />
   );
 };

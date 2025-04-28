@@ -85,9 +85,19 @@ Do not add any text outside the JSON. Only return clean JSON.`;
     });
 
     const aiData = await aiRes.json();
-    const guidanceJson = JSON.stringify(
-      JSON.parse(aiData?.choices?.[0]?.message?.content)
-    );
+    let content = aiData?.choices?.[0]?.message?.content || "";
+
+    // Remove ```json or ``` wrapping if present
+    content = content.trim();
+    if (content.startsWith("```")) {
+      content = content
+        .replace(/^```(json)?/, "")
+        .replace(/```$/, "")
+        .trim();
+    }
+
+    // Now safely parse
+    const guidanceJson = JSON.stringify(JSON.parse(content));
 
     if (!guidanceJson) {
       return new Response(

@@ -225,37 +225,39 @@ const StudentDashboard = () => {
                                     )}
                                   </div>
                                   <ul className="p-4 space-y-2">
-                                    {section.tasks?.map((task, tIndex) => {
-                                      const stepKey = `${sIndex}-${tIndex}`;
-                                      return (
-                                        <li
-                                          key={tIndex}
-                                          className={`flex items-start gap-2 px-2 py-1 rounded ${
-                                            completed.includes(stepKey)
-                                              ? "bg-green-50 border border-green-200"
-                                              : ""
-                                          }`}
-                                        >
-                                          <input
-                                            type="checkbox"
-                                            checked={completed.includes(
-                                              stepKey
-                                            )}
-                                            onChange={() =>
-                                              handleStepToggle(
-                                                assignment.assignment_id,
-                                                sIndex,
-                                                tIndex
-                                              )
-                                            }
-                                            className="mt-1"
-                                          />
-                                          <span className="text-sm text-gray-800">
-                                            {task}
-                                          </span>
-                                        </li>
-                                      );
-                                    })}
+                                    {(section.tasks || section.task || []).map(
+                                      (task, tIndex) => {
+                                        const stepKey = `${sIndex}-${tIndex}`;
+                                        return (
+                                          <li
+                                            key={tIndex}
+                                            className={`flex items-start gap-2 px-2 py-1 rounded ${
+                                              completed.includes(stepKey)
+                                                ? "bg-green-50 border border-green-200"
+                                                : ""
+                                            }`}
+                                          >
+                                            <input
+                                              type="checkbox"
+                                              checked={completed.includes(
+                                                stepKey
+                                              )}
+                                              onChange={() =>
+                                                handleStepToggle(
+                                                  assignment.assignment_id,
+                                                  sIndex,
+                                                  tIndex
+                                                )
+                                              }
+                                              className="mt-1"
+                                            />
+                                            <span className="text-sm text-gray-800">
+                                              {task}
+                                            </span>
+                                          </li>
+                                        );
+                                      }
+                                    )}
                                   </ul>
                                 </div>
                               ))}

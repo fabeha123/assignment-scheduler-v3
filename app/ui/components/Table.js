@@ -93,7 +93,7 @@ export default function Table({
           </div>
         ))}
 
-        {isAddButtonVisible && (
+        {addButton && (
           <div className="p-4">
             <Button
               variant={addButton.variant || "textOnly"}
